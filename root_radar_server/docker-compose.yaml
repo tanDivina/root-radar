@@ -1,0 +1,44 @@
+services:
+  # Development services
+  postgres:
+    image: pgvector/pgvector:pg16
+    ports:
+      - "8090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: root_radar
+      POSTGRES_PASSWORD: "-8SYJEmTxEIF22RPUqHuWbMnsxmHJlgr"
+    volumes:
+      - root_radar_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:6.2.6
+    ports:
+      - "8091:6379"
+    command: redis-server --requirepass "6dZojuhYIay7njpJF4R0OoumJLKke5Uu"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+
+  # Test services
+  postgres_test:
+    image: pgvector/pgvector:pg16
+    ports:
+      - "9090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: root_radar_test
+      POSTGRES_PASSWORD: "lQc7D680kBIj2wsR92g9XIT-Nb-r1zAh"
+    volumes:
+      - root_radar_test_data:/var/lib/postgresql/data
+
+  redis_test:
+    image: redis:6.2.6
+    ports:
+      - "9091:6379"
+    command: redis-server --requirepass "YeKcfbNYYItBsLYg8KSTHtm4g_C8pOhM"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+
+volumes:
+  root_radar_data:
+  root_radar_test_data:

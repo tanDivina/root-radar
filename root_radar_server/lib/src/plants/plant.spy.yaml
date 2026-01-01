@@ -1,0 +1,10 @@
+class: Plant
+table: plant
+fields:
+  name: String
+  variety: String?
+  plantedAt: DateTime
+  daysToHarvest: int?
+  category: String?
+  anchorId: String
+  notes: String?
