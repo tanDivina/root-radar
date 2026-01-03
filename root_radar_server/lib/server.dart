@@ -13,6 +13,7 @@ import 'src/future_calls/morning_briefing_call.dart';
 /// The starting point of the Serverpod server.
 void run(List<String> args) async {
   // Initialize Serverpod and connect it with your generated code.
+  print('SERVER STARTING - VERSION 2');
   final pod = Serverpod(args, Protocol(), Endpoints());
 
   // Initialize authentication services for the server.
