@@ -6,5 +6,10 @@ fields:
   plantedAt: DateTime
   daysToHarvest: int?
   category: String?
+  plantType: String?
+  latitude: double?
+  longitude: double?
   anchorId: String
   notes: String?
+  imageUrl: String?
+  userInfoId: int?

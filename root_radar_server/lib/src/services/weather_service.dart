@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:serverpod/serverpod.dart';
 
 class WeatherData {
   final double temperature;
@@ -14,19 +15,40 @@ class WeatherData {
 }
 
 class WeatherService {
-  // In a real app, you would get this from a secret or environment variable
-  static const String _apiKey = 'MOCK_API_KEY';
+  Future<WeatherData> getForecast(Session session, double lat, double lon) async {
+    final apiKey = session.serverpod.getPassword('weatherApiKey') ?? 'MOCK_API_KEY';
 
-  Future<WeatherData> getForecast(double lat, double lon) async {
-    // Mocking the response for now to ensure the Butler works without a real API key
-    // In a real implementation, we would use:
-    // final response = await http.get(Uri.parse('https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$_apiKey&units=metric'));
-    
-    // Simulating a heatwave for demonstration purposes
+    if (apiKey == 'MOCK_API_KEY') {
+      return WeatherData(
+        temperature: 36.5,
+        condition: 'Sunny',
+        isHeatwave: true,
+      );
+    }
+
+    try {
+      final response = await http.get(Uri.parse(
+        'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$apiKey&units=metric',
+      ));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final temp = data['main']['temp'].toDouble();
+        final condition = data['weather'][0]['main'];
+        return WeatherData(
+          temperature: temp,
+          condition: condition,
+          isHeatwave: temp > 30, // Simple heatwave logic
+        );
+      }
+    } catch (e) {
+      print('Error fetching weather: $e');
+    }
+
     return WeatherData(
-      temperature: 36.5,
-      condition: 'Sunny',
-      isHeatwave: true,
+      temperature: 20.0,
+      condition: 'Cloudy',
+      isHeatwave: false,
     );
   }
 }

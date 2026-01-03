@@ -1,38 +1,37 @@
 import 'package:flutter/material.dart';
-
 import '../main.dart';
 
 class GreetingsScreen extends StatefulWidget {
-  final Future<void> Function()? onSignOut;
-  const GreetingsScreen({super.key, this.onSignOut});
+  const GreetingsScreen({super.key});
 
   @override
   State<GreetingsScreen> createState() => _GreetingsScreenState();
 }
 
 class _GreetingsScreenState extends State<GreetingsScreen> {
-  /// Holds the last result or null if no result exists yet.
   String? _resultMessage;
-
-  /// Holds the last error message that we've received from the server or null
-  /// if no error exists yet.
   String? _errorMessage;
-
   final _textEditingController = TextEditingController();
+  bool _isTyping = false;
 
-  /// Calls the `hello` method of the `greeting` endpoint. Will set either the
-  /// `_resultMessage` or `_errorMessage` field, depending on if the call
-  /// is successful.
-  void _callHello() async {
+  void _askButler() async {
+    if (_textEditingController.text.isEmpty) return;
+    
+    setState(() {
+      _isTyping = true;
+      _errorMessage = null;
+    });
+
     try {
       final result = await client.greeting.hello(_textEditingController.text);
       setState(() {
-        _errorMessage = null;
         _resultMessage = result.message;
+        _isTyping = false;
       });
     } catch (e) {
       setState(() {
         _errorMessage = '$e';
+        _isTyping = false;
       });
     }
   }
@@ -40,65 +39,70 @@ class _GreetingsScreenState extends State<GreetingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (widget.onSignOut != null) ...[
-            const Text('You are connected'),
-            ElevatedButton(
-              onPressed: widget.onSignOut,
-              child: const Text('Sign out'),
-            ),
-          ],
+          Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: Colors.green.shade100,
+                radius: 30,
+                child: const Icon(Icons.person, size: 35, color: Colors.green),
+              ),
+              const SizedBox(width: 16),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'The Butler',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  Text('Online and ready to assist'),
+                ],
+              ),
+            ],
+          ),
           const SizedBox(height: 32),
+          const Text(
+            'Ask me anything about your garden, Sir.',
+            style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+          ),
+          const SizedBox(height: 16),
           TextField(
             controller: _textEditingController,
-            decoration: const InputDecoration(hintText: 'Enter your name'),
+            decoration: InputDecoration(
+              hintText: 'e.g. How are my tomatoes?',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.send),
+                onPressed: _askButler,
+              ),
+            ),
+            onSubmitted: (_) => _askButler(),
           ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _callHello,
-            child: const Text('Send to Server'),
-          ),
-          const SizedBox(height: 16),
-          ResultDisplay(
-            resultMessage: _resultMessage,
-            errorMessage: _errorMessage,
-          ),
+          const SizedBox(height: 24),
+          if (_isTyping)
+            const Center(child: CircularProgressIndicator())
+          else if (_resultMessage != null || _errorMessage != null)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: _errorMessage != null ? Colors.red.shade50 : Colors.green.shade50,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: _errorMessage != null ? Colors.red.shade200 : Colors.green.shade200,
+                ),
+              ),
+              child: Text(
+                _errorMessage ?? _resultMessage!,
+                style: TextStyle(
+                  color: _errorMessage != null ? Colors.red.shade900 : Colors.green.shade900,
+                  fontSize: 16,
+                ),
+              ),
+            ),
         ],
-      ),
-    );
-  }
-}
-
-/// ResultDisplays shows the result of the call. Either the returned result
-/// from the `example.greeting` endpoint method or an error message.
-class ResultDisplay extends StatelessWidget {
-  final String? resultMessage;
-  final String? errorMessage;
-
-  const ResultDisplay({super.key, this.resultMessage, this.errorMessage});
-
-  @override
-  Widget build(BuildContext context) {
-    String text;
-    Color backgroundColor;
-    if (errorMessage != null) {
-      backgroundColor = Colors.red[300]!;
-      text = errorMessage!;
-    } else if (resultMessage != null) {
-      backgroundColor = Colors.green[300]!;
-      text = resultMessage!;
-    } else {
-      backgroundColor = Colors.grey[300]!;
-      text = 'No server response yet.';
-    }
-
-    return ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: 50),
-      child: Container(
-        color: backgroundColor,
-        child: Center(child: Text(text)),
       ),
     );
   }

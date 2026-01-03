@@ -143,18 +143,35 @@ class _RadarScreenState extends State<RadarScreen> {
         result['variety'] ?? '',
         result['notes'] ?? '',
         int.tryParse(result['daysToHarvest'] ?? '60') ?? 60,
+        result['category'],
+        result['imagePath'],
       );
     }
   }
 
-  Future<void> _savePlant(String name, String variety, String notes, int daysToHarvest) async {
+  Future<void> _savePlant(
+    String name,
+    String variety,
+    String notes,
+    int daysToHarvest,
+    String? category,
+    String? imagePath,
+  ) async {
+    String? imageUrl;
+    if (imagePath != null) {
+      // On web we don't have a path, we have bytes. This will be handled in _uploadImage.
+      imageUrl = await _uploadImage(imagePath);
+    }
+
     final plant = Plant(
       name: name,
       variety: variety,
       plantedAt: DateTime.now(),
       daysToHarvest: daysToHarvest,
-      anchorId: 'temp_anchor_${DateTime.now().millisecondsSinceEpoch}', // Placeholder
+      anchorId: 'temp_anchor_${DateTime.now().millisecondsSinceEpoch}',
       notes: notes,
+      category: category,
+      imageUrl: imageUrl,
     );
 
     try {
@@ -172,6 +189,29 @@ class _RadarScreenState extends State<RadarScreen> {
         );
       }
     }
+  }
+
+  Future<String?> _uploadImage(String path) async {
+    try {
+      final fileName = 'plant_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final uploadDescription = await client.garden.getUploadDescription(fileName);
+      if (uploadDescription != null) {
+        final uploader = FileUploader(uploadDescription);
+        
+        // Use XFile to read bytes, which works on both web and mobile
+        final xFile = XFile(path);
+        final bytes = await xFile.readAsBytes();
+        await uploader.upload(Stream.value(bytes));
+        
+        final success = await client.garden.verifyUpload(fileName);
+        if (success) {
+          return fileName;
+        }
+      }
+    } catch (e) {
+      debugPrint('Error uploading image: $e');
+    }
+    return null;
   }
 }
 
@@ -217,6 +257,20 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
   final _varietyController = TextEditingController();
   final _notesController = TextEditingController();
   final _harvestController = TextEditingController(text: '60');
+  String _selectedCategory = 'Vegetable';
+  XFile? _image;
+  final ImagePicker _picker = ImagePicker();
+
+  final List<String> _categories = ['Vegetable', 'Fruit', 'Flower', 'Herb', 'Other'];
+
+  Future<void> _pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+    if (image != null) {
+      setState(() {
+        _image = image;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -231,84 +285,135 @@ class _AddPlantSheetState extends State<AddPlantSheet> {
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'New Root Radar Entry',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20),
-          TextField(
-            controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'Plant Name',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.eco),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'New Root Radar Entry',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _varietyController,
-                  decoration: const InputDecoration(
-                    labelText: 'Variety (Optional)',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.category),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(12),
+                      image: _image != null
+                          ? DecorationImage(
+                              image: kIsWeb 
+                                  ? NetworkImage(_image!.path) as ImageProvider
+                                  : FileImage(io.File(_image!.path)),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
+                    child: _image == null
+                        ? const Icon(Icons.add_a_photo, color: Colors.grey)
+                        : null,
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              SizedBox(
-                width: 120,
-                child: TextField(
-                  controller: _harvestController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Days to Harvest',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.timer),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: TextField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Plant Name',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.eco),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _notesController,
-            maxLines: 3,
-            decoration: const InputDecoration(
-              labelText: 'Notes',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.notes),
+              ],
             ),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context, {
-                  'name': _nameController.text,
-                  'variety': _varietyController.text,
-                  'notes': _notesController.text,
-                  'daysToHarvest': _harvestController.text,
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green.shade800,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              child: const Text('Confirm Location'),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: _selectedCategory,
+                    decoration: const InputDecoration(
+                      labelText: 'Category',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: _categories.map((String category) {
+                      return DropdownMenuItem(
+                        value: category,
+                        child: Text(category),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedCategory = newValue!;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                SizedBox(
+                  width: 120,
+                  child: TextField(
+                    controller: _harvestController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Days to Harvest',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 20),
-        ],
+            const SizedBox(height: 12),
+            TextField(
+              controller: _varietyController,
+              decoration: const InputDecoration(
+                labelText: 'Variety (Optional)',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.category),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _notesController,
+              maxLines: 2,
+              decoration: const InputDecoration(
+                labelText: 'Notes',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.notes),
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context, {
+                    'name': _nameController.text,
+                    'variety': _varietyController.text,
+                    'notes': _notesController.text,
+                    'daysToHarvest': _harvestController.text,
+                    'category': _selectedCategory,
+                    'imagePath': _image?.path,
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green.shade800,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('Confirm Location'),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }

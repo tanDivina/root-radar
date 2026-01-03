@@ -1,0 +1,12 @@
+{
+    "java.import.exclusions": [
+        "**/node_modules/**",
+        "**/.metadata/**",
+        "**/archetype-resources/**",
+        "**/META-INF/maven/**",
+        "**/android/app/build/**",
+        "**/android/build/**",
+        "/Users/dorienvandenabbeele/.pub-cache/**",
+        "/opt/homebrew/share/flutter/**"
+    ]
+}

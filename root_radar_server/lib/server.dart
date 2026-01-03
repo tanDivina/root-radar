@@ -79,6 +79,9 @@ void run(List<String> args) async {
 
   // Start the server.
   await pod.start();
+
+  // Trigger the first Morning Briefing 10 seconds after startup for testing
+  pod.futureCallWithDelay('morningBriefing', null, const Duration(seconds: 10));
 }
 
 void _sendRegistrationCode(

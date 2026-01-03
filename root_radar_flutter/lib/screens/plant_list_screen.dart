@@ -89,14 +89,28 @@ class _PlantListScreenState extends State<PlantListScreen> {
         final plant = plants[index];
         return Card(
           elevation: 4,
-          margin: const EdgeInsets.bottom(16),
+          margin: const EdgeInsets.only(bottom: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: ListTile(
             contentPadding: const EdgeInsets.all(16),
-            leading: CircleAvatar(
-              backgroundColor: Colors.green.shade100,
-              child: Icon(Icons.eco, color: Colors.green.shade800),
-            ),
+            leading: plant.imageUrl != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      '${client.host}serverpod_cloud_storage?storageId=public&path=${plant.imageUrl}',
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => CircleAvatar(
+                        backgroundColor: Colors.green.shade100,
+                        child: Icon(Icons.eco, color: Colors.green.shade800),
+                      ),
+                    ),
+                  )
+                : CircleAvatar(
+                    backgroundColor: Colors.green.shade100,
+                    child: Icon(Icons.eco, color: Colors.green.shade800),
+                  ),
             title: Text(
               plant.name,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
@@ -104,12 +118,12 @@ class _PlantListScreenState extends State<PlantListScreen> {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text('${plant.category ?? "Plant"} - Planted: ${DateFormat('MMM dd, yyyy').format(plant.plantedAt)}'),
                 if (plant.variety != null && plant.variety!.isNotEmpty)
                   Text('Variety: ${plant.variety}'),
-                Text('Planted: ${DateFormat('MMM dd, yyyy').format(plant.plantedAt)}'),
                 if (plant.notes != null && plant.notes!.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.top(4.0),
+                    padding: const EdgeInsets.only(top: 4.0),
                     child: Text(
                       plant.notes!,
                       style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey.shade600),
@@ -128,7 +142,7 @@ class _PlantListScreenState extends State<PlantListScreen> {
   }
 
   Future<void> _onAddPlantPressed() async {
-    final result = await showModalBottomSheet<Map<String, String>>(
+    final result = await showModalBottomSheet<Map<String, dynamic>>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -141,11 +155,25 @@ class _PlantListScreenState extends State<PlantListScreen> {
         result['variety'] ?? '',
         result['notes'] ?? '',
         int.tryParse(result['daysToHarvest'] ?? '60') ?? 60,
+        result['category'],
+        result['imagePath'],
       );
     }
   }
 
-  Future<void> _savePlant(String name, String variety, String notes, int daysToHarvest) async {
+  Future<void> _savePlant(
+    String name,
+    String variety,
+    String notes,
+    int daysToHarvest,
+    String? category,
+    String? imagePath,
+  ) async {
+    String? imageUrl;
+    if (imagePath != null) {
+      imageUrl = await _uploadImage(imagePath);
+    }
+
     final plant = Plant(
       name: name,
       variety: variety,
@@ -153,6 +181,8 @@ class _PlantListScreenState extends State<PlantListScreen> {
       daysToHarvest: daysToHarvest,
       anchorId: 'list_entry_${DateTime.now().millisecondsSinceEpoch}',
       notes: notes,
+      category: category,
+      imageUrl: imageUrl,
     );
 
     try {
@@ -178,5 +208,27 @@ class _PlantListScreenState extends State<PlantListScreen> {
         );
       }
     }
+  }
+
+  Future<String?> _uploadImage(String path) async {
+    try {
+      final fileName = 'plant_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final uploadDescription = await client.garden.getUploadDescription(fileName);
+      if (uploadDescription != null) {
+        final uploader = FileUploader(uploadDescription);
+        
+        final xFile = XFile(path);
+        final bytes = await xFile.readAsBytes();
+        await uploader.upload(Stream.value(bytes));
+        
+        final success = await client.garden.verifyUpload(fileName);
+        if (success) {
+          return fileName;
+        }
+      }
+    } catch (e) {
+      debugPrint('Error uploading image: $e');
+    }
+    return null;
   }
 }

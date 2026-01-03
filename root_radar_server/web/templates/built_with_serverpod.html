@@ -1,34 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Built with Serverpod</title>
-    <link rel="stylesheet" href="/css/style.css">
-  </head>
-  <body>
-    <div class="content">
-      <div class="logo-box">
-        <img src="/images/serverpod-logo.svg" width="160" style="margin-top: 8px; margin-bottom: 12px;">
-        <p><a href="https://serverpod.dev/">The missing server for Flutter</a></p>
-      </div>
-      <hr>
-      <div class="info-box">
-        <p>Served at: {{served}}</p>
-        <p>Run mode: {{runmode}}</p>
-      </div>
-      <div style="text-align: center; margin: 20px 0;">
-        <a class="cta" href="/app">
-            Open Flutter app 
-          </a>
-      </div>
-      <hr>
-      <div class="link-box">
-        <a href="https://serverpod.dev">Serverpod</a>
-        •
-        <a href="https://docs.serverpod.dev">Get Started</a>
-        •
-        <a href="https://github.com/serverpod/serverpod">Github</a>
-      </div>
+
+<head>
+  <meta charset="utf-8">
+  <title>Root Radar | Your AI Gardening Assistant</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f0f4f0;
+    }
+
+    .content {
+      max-width: 600px;
+      margin: 50px auto;
+      background: white;
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      color: #1b5e20;
+      margin-bottom: 8px;
+    }
+
+    p {
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .cta {
+      display: inline-block;
+      background: #2e7d32;
+      color: white;
+      padding: 16px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: bold;
+      margin: 24px 0;
+      transition: transform 0.2s;
+    }
+
+    .cta:hover {
+      transform: scale(1.05);
+    }
+
+    .footer {
+      font-size: 14px;
+      color: #999;
+      margin-top: 40px;
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="content">
+    <div class="logo">🌿</div>
+    <h1>Root Radar</h1>
+    <p>Your personal AI gardening assistant, powered by Serverpod.</p>
+
+    <a class="cta" href="/app">
+      Open My Garden
+    </a>
+
+    <div class="info-box">
+      <p>Server Status: <strong>Online</strong></p>
+      <p>Run mode: {{runmode}}</p>
     </div>
-  </body>
+
+    <div class="footer">
+      Built with ❤️ for gardeners everywhere.
+    </div>
+  </div>
+</body>
+
 </html>
