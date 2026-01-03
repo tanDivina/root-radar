@@ -9,12 +9,14 @@ import 'src/generated/protocol.dart';
 import 'src/web/routes/app_config_route.dart';
 import 'src/web/routes/root.dart';
 import 'src/future_calls/morning_briefing_call.dart';
+import 'src/services/mail_service.dart';
 
 /// The starting point of the Serverpod server.
 void run(List<String> args) async {
   // Initialize Serverpod and connect it with your generated code.
-  print('SERVER STARTING - VERSION 2');
   final pod = Serverpod(args, Protocol(), Endpoints());
+
+  final mailService = MailService();
 
   // Initialize authentication services for the server.
   // Token managers will be used to validate and issue authentication keys,
@@ -27,8 +29,22 @@ void run(List<String> args) async {
     identityProviderBuilders: [
       // Configure the email identity provider for email/password authentication.
       EmailIdpConfigFromPasswords(
-        sendRegistrationVerificationCode: _sendRegistrationCode,
-        sendPasswordResetVerificationCode: _sendPasswordResetCode,
+        sendRegistrationVerificationCode: (session,
+            {required email,
+            required accountRequestId,
+            required verificationCode,
+            required transaction}) async {
+          await mailService.sendRegistrationCode(
+              session, email, verificationCode);
+        },
+        sendPasswordResetVerificationCode: (session,
+            {required email,
+            required passwordResetRequestId,
+            required verificationCode,
+            required transaction}) async {
+          await mailService.sendPasswordResetCode(
+              session, email, verificationCode);
+        },
       ),
     ],
   );
@@ -69,26 +85,3 @@ void run(List<String> args) async {
   pod.futureCallWithDelay('morningBriefing', null, const Duration(seconds: 10));
 }
 
-void _sendRegistrationCode(
-  Session session, {
-  required String email,
-  required UuidValue accountRequestId,
-  required String verificationCode,
-  required Transaction? transaction,
-}) {
-  // NOTE: Here you call your mail service to send the verification code to
-  // the user. For testing, we will just log the verification code.
-  session.log('[EmailIdp] Registration code ($email): $verificationCode');
-}
-
-void _sendPasswordResetCode(
-  Session session, {
-  required String email,
-  required UuidValue passwordResetRequestId,
-  required String verificationCode,
-  required Transaction? transaction,
-}) {
-  // NOTE: Here you call your mail service to send the verification code to
-  // the user. For testing, we will just log the verification code.
-  session.log('[EmailIdp] Password reset code ($email): $verificationCode');
-}
