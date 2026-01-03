@@ -56,9 +56,7 @@ void run(List<String> args) async {
     // Serve the flutter web app under the /app path.
     pod.webServer.addRoute(
       FlutterRoute(
-        Directory(
-          Uri(path: 'web/app').toFilePath(),
-        ),
+        Directory('web/app'),
       ),
       '/app',
     );
