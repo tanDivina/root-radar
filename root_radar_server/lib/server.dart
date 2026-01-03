@@ -50,27 +50,13 @@ void run(List<String> args) async {
     '/app/assets/assets/config.json',
   );
 
-  // Checks if the flutter web app has been built and serves it if it has.
-  final appDir = Directory('web/app');
-  if (appDir.existsSync()) {
-    // Serve the flutter web app under the /app path.
-    pod.webServer.addRoute(
-      FlutterRoute(
-        Directory('web/app'),
-      ),
-      '/app',
-    );
-  } else {
-    // If the flutter web app has not been built, serve the build app page.
-    pod.webServer.addRoute(
-      StaticRoute.file(
-        File(
-          Uri(path: 'web/pages/build_flutter_app.html').toFilePath(),
-        ),
-      ),
-      '/app/**',
-    );
-  }
+  // Serve the flutter web app under the /app path.
+  pod.webServer.addRoute(
+    FlutterRoute(
+      Directory(Uri(path: 'web/app').toFilePath()),
+    ),
+    '/app',
+  );
 
   // Register FutureCalls
   pod.registerFutureCall(MorningBriefingCall(), 'morningBriefing');
