@@ -10,7 +10,7 @@ import 'package:ar_flutter_plugin/models/ar_node.dart';
 import 'package:flutter/material.dart';
 import 'package:root_radar_client/root_radar_client.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
-import '../main.dart';
+import '../services/demo_plant_service.dart';
 
 class RadarScreen extends StatefulWidget {
   const RadarScreen({super.key});
@@ -36,7 +36,7 @@ class _RadarScreenState extends State<RadarScreen> {
 
   Future<void> _loadPlants() async {
     try {
-      final loadedPlants = await client.garden.getAllPlants();
+      final loadedPlants = await DemoPlantService().getAllPlants();
       setState(() {
         plants = loadedPlants;
       });
@@ -158,15 +158,19 @@ class _RadarScreenState extends State<RadarScreen> {
     );
 
     try {
-      await client.garden.savePlant(plant);
+      await DemoPlantService().savePlant(plant);
       _loadPlants();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$name pinned to the radar!')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$name pinned to the radar!')),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save plant: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save plant: $e')),
+        );
+      }
     }
   }
 }

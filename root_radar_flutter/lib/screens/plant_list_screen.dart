@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:root_radar_client/root_radar_client.dart';
 import 'package:intl/intl.dart';
-import '../main.dart';
+import '../services/demo_plant_service.dart';
 import 'radar_screen.dart'; // To reuse the AddPlantSheet
 
 class PlantListScreen extends StatefulWidget {
@@ -24,7 +24,7 @@ class _PlantListScreenState extends State<PlantListScreen> {
   Future<void> _loadPlants() async {
     setState(() => isLoading = true);
     try {
-      final loadedPlants = await client.garden.getAllPlants();
+      final loadedPlants = await DemoPlantService().getAllPlants();
       setState(() {
         plants = loadedPlants;
         isLoading = false;
@@ -156,23 +156,27 @@ class _PlantListScreenState extends State<PlantListScreen> {
     );
 
     try {
-      await client.garden.savePlant(plant);
+      await DemoPlantService().savePlant(plant);
       _loadPlants();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save plant: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save plant: $e')),
+        );
+      }
     }
   }
 
   Future<void> _deletePlant(int id) async {
     try {
-      await client.garden.deletePlant(id);
+      await DemoPlantService().deletePlant(id);
       _loadPlants();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete plant: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete plant: $e')),
+        );
+      }
     }
   }
 }
