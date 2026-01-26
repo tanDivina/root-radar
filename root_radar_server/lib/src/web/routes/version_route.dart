@@ -2,12 +2,12 @@ import 'package:serverpod/serverpod.dart';
 import '../../version.dart';
 
 class VersionWidget extends TemplateWidget {
-  VersionWidget({required String fullServerVersion}) : super(name: 'version', values: {'fullServerVersion': fullServerVersion});
+  VersionWidget({required String version}) : super(name: 'version', values: {'fullServerVersion': version});
 }
 
-class VersionRoute extends TemplateRoute {
+class VersionRoute extends WidgetRoute {
   @override
-  Future<Map<String, dynamic>> build(Session session, Request request) async {
-    return {'fullServerVersion': fullServerVersion};
+  Future<TemplateWidget> build(Session session, Request request) async {
+    return VersionWidget(version: fullServerVersion);
   }
 }
