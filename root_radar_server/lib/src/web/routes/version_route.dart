@@ -6,7 +6,7 @@ class VersionRoute extends Route {
   @override
   Future<bool> handleCall(Session session, Request request) async {
     try {
-      final response = request.response;
+      final response = request.httpRequest.response;
       response.contentType = ContentType.parse('text/plain; charset=utf-8');
       response.write(fullServerVersion);
       return true;
