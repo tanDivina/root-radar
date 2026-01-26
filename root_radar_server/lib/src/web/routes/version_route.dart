@@ -1,18 +1,16 @@
-import 'dart:io';
 import 'package:serverpod/serverpod.dart';
 import '../../version.dart';
 
-class VersionRoute extends Route {
+class VersionWidget extends TemplateWidget {
+  VersionWidget() : super(name: 'version');
+  
   @override
-  Future<bool> handleCall(Session session, Request request) async {
-    try {
-      final response = request.httpRequest.response;
-      response.contentType = ContentType.parse('text/plain; charset=utf-8');
-      response.write(fullServerVersion);
-      return true;
-    } catch (e, stack) {
-      session.log('Error in VersionRoute: $e', level: LogLevel.error, stackTrace: stack);
-      return false; // Let Serverpod handle the error response
-    }
+  String toString() => fullServerVersion;
+}
+
+class VersionRoute extends WidgetRoute {
+  @override
+  Future<TemplateWidget> build(Session session, Request request) async {
+    return VersionWidget();
   }
 }
