@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Root Radar - Updating...</title>
+    <script>
+        async function nukeAndPave() {
+            console.log('Nuking caches...');
+
+            // 1. Unregister Service Workers
+            if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (let registration of registrations) {
+                    await registration.unregister();
+                    console.log('Unregistered SW:', registration.scope);
+                }
+            }
+
+            // 2. Clear Caches
+            if ('caches' in window) {
+                const keys = await caches.keys();
+                for (const key of keys) {
+                    await caches.delete(key);
+                    console.log('Deleted Cache:', key);
+                }
+            }
+
+            // 4. Force a small delay to ensure OS/Browser sync
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // 5. Redirect to App with unique param
+            window.location.href = '/app/?v=18_9_1&t=' + new Date().getTime();
+        }
+
+        window.onload = nukeAndPave;
+    </script>
+</head>
+
+<body style="background-color: #222; color: #fff; font-family: sans-serif; text-align: center; padding-top: 50px;">
+    <h1>Updating Root Radar...</h1>
+    <p>Clearing old versions and redirecting you to the latest Butler.</p>
+    <p>Please wait...</p>
+</body>
+
+</html>
