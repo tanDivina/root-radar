@@ -1,13 +1,13 @@
 import 'package:serverpod/serverpod.dart';
 import '../../version.dart';
 
-class VersionWidget extends TemplateWidget {
-  VersionWidget({required String version}) : super(name: 'version', values: {'fullServerVersion': version});
-}
-
-class VersionRoute extends WidgetRoute {
+class VersionRoute extends Route {
   @override
-  Future<TemplateWidget> build(Session session, Request request) async {
-    return VersionWidget(version: fullServerVersion);
+  Future<bool> handleCall(Session session, Request request) async {
+    request.httpRequest.response
+      ..headers.contentType = ContentType.text
+      ..write(fullServerVersion)
+      ..close();
+    return true;
   }
 }
