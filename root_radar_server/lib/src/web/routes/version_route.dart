@@ -5,9 +5,9 @@ class VersionWidget extends TemplateWidget {
   VersionWidget({required String fullServerVersion}) : super(name: 'version', values: {'fullServerVersion': fullServerVersion});
 }
 
-class VersionRoute extends WidgetRoute {
+class VersionRoute extends TemplateRoute {
   @override
-  Future<TemplateWidget> build(Session session, Request request) async {
-    return VersionWidget(fullServerVersion: fullServerVersion);
+  Future<Map<String, dynamic>> build(Session session, Request request) async {
+    return {'fullServerVersion': fullServerVersion};
   }
 }
