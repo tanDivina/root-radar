@@ -74,6 +74,10 @@ void run(List<String> args) async {
     AppConfigRoute(apiConfig: pod.config.apiServer),
     '/app/assets/config.json',
   );
+  pod.webServer.addRoute(
+    AppConfigRoute(apiConfig: pod.config.apiServer),
+    '/app/assets/assets/config.json',
+  );
 
   // Serve the flutter web app under the /app path.
   pod.webServer.addRoute(
