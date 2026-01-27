@@ -56,20 +56,8 @@ void run(List<String> args) async {
     ],
   );
 
-  // Setup a default page at the web root.
-  // These are used by the default page.
-  pod.webServer.addRoute(RootRoute(), '/');
-  pod.webServer.addRoute(RootRoute(), '/index.html');
+  // --- HIGH PRIORITY ROUTES ---
   pod.webServer.addRoute(VersionRoute(), '/version');
-
-  // Serve all files in the web/static relative directory under /.
-  // These are used by the default web page.
-  final root = Directory(Uri(path: 'web/static').toFilePath());
-  pod.webServer.addRoute(StaticRoute.directory(root), '/static');
-
-  // Setup the app config route.
-  // We build this configuration based on the servers api url and serve it to
-  // the flutter app.
   pod.webServer.addRoute(
     AppConfigRoute(apiConfig: pod.config.apiServer),
     '/app/assets/config.json',
@@ -78,6 +66,20 @@ void run(List<String> args) async {
     AppConfigRoute(apiConfig: pod.config.apiServer),
     '/app/assets/assets/config.json',
   );
+  pod.webServer.addRoute(
+    AppConfigRoute(apiConfig: pod.config.apiServer),
+    '/config.json',
+  );
+
+  // Setup a default page at the web root.
+  // These are used by the default page.
+  pod.webServer.addRoute(RootRoute(), '/');
+  pod.webServer.addRoute(RootRoute(), '/index.html');
+
+  // Serve all files in the web/static relative directory under /.
+  // These are used by the default web page.
+  final root = Directory(Uri(path: 'web/static').toFilePath());
+  pod.webServer.addRoute(StaticRoute.directory(root), '/static');
 
   // Serve the flutter web app under the /app path.
   pod.webServer.addRoute(
