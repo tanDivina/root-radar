@@ -7,21 +7,21 @@
 # Configuration for the main API server.
 apiServer:
   port: 8080
-  publicHost: my-awesome-project.serverpod.space
+  publicHost: root-radar-v4.api.serverpod.space
   publicPort: 443
   publicScheme: https
 
 # Configuration for the Insights server.
 insightsServer:
   port: 8081
-  publicHost: my-awesome-project.serverpod.space
+  publicHost: root-radar-v4.serverpod.space
   publicPort: 443
   publicScheme: https
 
 # Configuration for the web server.
 webServer:
   port: 8082
-  publicHost: my-awesome-project.serverpod.space
+  publicHost: root-radar-v4.serverpod.space
   publicPort: 443
   publicScheme: https
 
@@ -30,9 +30,9 @@ webServer:
 # If you are connecting on a public IP (e.g. on AWS or Google Cloud Run), you
 # connect on the public IP of the database e.g. database.examplepod.com.
 database:
-  host: database.private-production.examplepod.com
+  host: ep-orange-rain-agu4xhq0-pooler.c-2.eu-central-1.aws.neon.tech
   port: 5432
-  name: serverpod
+  name: default
   user: postgres
   requireSsl: true
   #isUnixSocket: true # defaults to false
