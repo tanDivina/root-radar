@@ -51,7 +51,7 @@ class ButlerService {
   }
 
   Future<void> _generateAIBriefing(Session session, int userId, String apiKey, List<Plant> plants) async {
-    final model = GenerativeModel(model: 'gemini-2.0-flash', apiKey: apiKey);
+    final model = GenerativeModel(model: 'gemini-2.5-flash-lite', apiKey: apiKey);
 
     // Build Context
     final sb = StringBuffer();
