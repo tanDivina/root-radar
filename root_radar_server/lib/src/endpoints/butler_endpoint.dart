@@ -8,8 +8,8 @@ class ButlerEndpoint extends Endpoint {
   bool get requireLogin => false; // Allow demo mode access
 
   Future<List<ButlerMessage>> getMessages(Session session) async {
-    // If not logged in, use Demo User ID (99999)
-    final userId = session.authenticated?.userId ?? 99999;
+    // If not logged in, use Demo User ID (1)
+    final userId = session.authenticated?.userId ?? 1;
 
     session.log('Fetching messages for user $userId', level: LogLevel.info);
 
@@ -24,8 +24,8 @@ class ButlerEndpoint extends Endpoint {
 
   Future<void> triggerBriefing(Session session) async {
     try {
-      // If not logged in, use Demo User ID (99999)
-      final userId = session.authenticated?.userId ?? 99999;
+      // If not logged in, use Demo User ID (1)
+      final userId = session.authenticated?.userId ?? 1;
       
       session.log('Manually triggering Briefing for user $userId', level: LogLevel.info);
 
