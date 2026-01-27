@@ -17,6 +17,7 @@ class AppConfigRoute extends WidgetRoute {
 
   @override
   Future<WebWidget> build(Session session, Request request) async {
+    session.log('AppConfigRoute hit: ${request.url.path}', level: LogLevel.info);
     return widget;
   }
 }
