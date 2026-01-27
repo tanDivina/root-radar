@@ -1,0 +1,5 @@
+class: WeatherData
+fields:
+  temperature: double
+  condition: String
+  isHeatwave: bool

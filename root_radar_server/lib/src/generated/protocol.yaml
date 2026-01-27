@@ -8,6 +8,15 @@ emailIdp:
   - finishPasswordReset:
 jwtRefresh:
   - refreshAccessToken:
+butler:
+  - getMessages:
+  - triggerBriefing:
+debug:
+  - triggerMorningBriefing:
+demo:
+  - seedPlants:
+weather:
+  - getWeather:
 greeting:
   - hello:
 garden:

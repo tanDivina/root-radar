@@ -1,18 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:serverpod/serverpod.dart';
+import '../generated/protocol.dart';
 
-class WeatherData {
-  final double temperature;
-  final String condition;
-  final bool isHeatwave;
-
-  WeatherData({
-    required this.temperature,
-    required this.condition,
-    required this.isHeatwave,
-  });
-}
+// WeatherData is now defined in protocol
 
 class WeatherService {
   Future<WeatherData> getForecast(Session session, double lat, double lon) async {

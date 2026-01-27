@@ -1,0 +1,7 @@
+class: ButlerMessage
+table: butler_message
+fields:
+  message: String
+  timestamp: DateTime
+  type: String
+  userInfoId: int

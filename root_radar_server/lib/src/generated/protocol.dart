@@ -17,11 +17,16 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i4;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i5;
-import 'greetings/greeting.dart' as _i6;
-import 'plants/plant.dart' as _i7;
-import 'package:root_radar_server/src/generated/plants/plant.dart' as _i8;
+import 'butler_message.dart' as _i6;
+import 'greetings/greeting.dart' as _i7;
+import 'plants/plant.dart' as _i8;
+import 'weather_data.dart' as _i9;
+import 'package:root_radar_server/src/generated/butler_message.dart' as _i10;
+import 'package:root_radar_server/src/generated/plants/plant.dart' as _i11;
+export 'butler_message.dart';
 export 'greetings/greeting.dart';
 export 'plants/plant.dart';
+export 'weather_data.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
   Protocol._();
@@ -31,6 +36,62 @@ class Protocol extends _i1.SerializationManagerServer {
   static final Protocol _instance = Protocol._();
 
   static final List<_i2.TableDefinition> targetTableDefinitions = [
+    _i2.TableDefinition(
+      name: 'butler_message',
+      dartName: 'ButlerMessage',
+      schema: 'public',
+      module: 'root_radar',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'butler_message_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'message',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'timestamp',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _i2.ColumnDefinition(
+          name: 'type',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'userInfoId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'butler_message_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+      ],
+      managed: true,
+    ),
     _i2.TableDefinition(
       name: 'plant',
       dartName: 'Plant',
@@ -168,20 +229,39 @@ class Protocol extends _i1.SerializationManagerServer {
       }
     }
 
-    if (t == _i6.Greeting) {
-      return _i6.Greeting.fromJson(data) as T;
+    if (t == _i6.ButlerMessage) {
+      return _i6.ButlerMessage.fromJson(data) as T;
     }
-    if (t == _i7.Plant) {
-      return _i7.Plant.fromJson(data) as T;
+    if (t == _i7.Greeting) {
+      return _i7.Greeting.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i6.Greeting?>()) {
-      return (data != null ? _i6.Greeting.fromJson(data) : null) as T;
+    if (t == _i8.Plant) {
+      return _i8.Plant.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i7.Plant?>()) {
-      return (data != null ? _i7.Plant.fromJson(data) : null) as T;
+    if (t == _i9.WeatherData) {
+      return _i9.WeatherData.fromJson(data) as T;
     }
-    if (t == List<_i8.Plant>) {
-      return (data as List).map((e) => deserialize<_i8.Plant>(e)).toList() as T;
+    if (t == _i1.getType<_i6.ButlerMessage?>()) {
+      return (data != null ? _i6.ButlerMessage.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i7.Greeting?>()) {
+      return (data != null ? _i7.Greeting.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i8.Plant?>()) {
+      return (data != null ? _i8.Plant.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i9.WeatherData?>()) {
+      return (data != null ? _i9.WeatherData.fromJson(data) : null) as T;
+    }
+    if (t == List<_i10.ButlerMessage>) {
+      return (data as List)
+              .map((e) => deserialize<_i10.ButlerMessage>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i11.Plant>) {
+      return (data as List).map((e) => deserialize<_i11.Plant>(e)).toList()
+          as T;
     }
     try {
       return _i3.Protocol().deserialize<T>(data, t);
@@ -200,8 +280,10 @@ class Protocol extends _i1.SerializationManagerServer {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
-      _i6.Greeting => 'Greeting',
-      _i7.Plant => 'Plant',
+      _i6.ButlerMessage => 'ButlerMessage',
+      _i7.Greeting => 'Greeting',
+      _i8.Plant => 'Plant',
+      _i9.WeatherData => 'WeatherData',
       _ => null,
     };
   }
@@ -216,10 +298,14 @@ class Protocol extends _i1.SerializationManagerServer {
     }
 
     switch (data) {
-      case _i6.Greeting():
+      case _i6.ButlerMessage():
+        return 'ButlerMessage';
+      case _i7.Greeting():
         return 'Greeting';
-      case _i7.Plant():
+      case _i8.Plant():
         return 'Plant';
+      case _i9.WeatherData():
+        return 'WeatherData';
     }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -246,11 +332,17 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
     }
+    if (dataClassName == 'ButlerMessage') {
+      return deserialize<_i6.ButlerMessage>(data['data']);
+    }
     if (dataClassName == 'Greeting') {
-      return deserialize<_i6.Greeting>(data['data']);
+      return deserialize<_i7.Greeting>(data['data']);
     }
     if (dataClassName == 'Plant') {
-      return deserialize<_i7.Plant>(data['data']);
+      return deserialize<_i8.Plant>(data['data']);
+    }
+    if (dataClassName == 'WeatherData') {
+      return deserialize<_i9.WeatherData>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -298,8 +390,10 @@ class Protocol extends _i1.SerializationManagerServer {
       }
     }
     switch (t) {
-      case _i7.Plant:
-        return _i7.Plant.t;
+      case _i6.ButlerMessage:
+        return _i6.ButlerMessage.t;
+      case _i8.Plant:
+        return _i8.Plant.t;
     }
     return null;
   }
@@ -310,4 +404,25 @@ class Protocol extends _i1.SerializationManagerServer {
 
   @override
   String getModuleName() => 'root_radar';
+
+  /// Maps any `Record`s known to this [Protocol] to their JSON representation
+  ///
+  /// Throws in case the record type is not known.
+  ///
+  /// This method will return `null` (only) for `null` inputs.
+  Map<String, dynamic>? mapRecordToJson(Record? record) {
+    if (record == null) {
+      return null;
+    }
+    try {
+      return _i3.Protocol().mapRecordToJson(record);
+    } catch (_) {}
+    try {
+      return _i4.Protocol().mapRecordToJson(record);
+    } catch (_) {}
+    try {
+      return _i5.Protocol().mapRecordToJson(record);
+    } catch (_) {}
+    throw Exception('Unsupported record type ${record.runtimeType}');
+  }
 }

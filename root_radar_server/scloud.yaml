@@ -8,7 +8,8 @@
 # For full documentation, visit: https://docs.serverpod.cloud
 
 project:
-  projectId: "root-radar"
+  projectId: "root-radar-v4"
   scripts:
-    pre_deploy: []
+    pre_deploy:
+      - "serverpod generate"
     post_deploy: []

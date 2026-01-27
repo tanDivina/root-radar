@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Global Reset</title>
+</head>
+
+<body>
+    <h1>GLOBAL RESET</h1>
+    <p>Attempting to remove all Service Workers...</p>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                if (registrations.length === 0) {
+                    document.body.innerHTML += '<p>No Service Workers found.</p>';
+                }
+                for (let registration of registrations) {
+                    registration.unregister().then(function (boolean) {
+                        document.body.innerHTML += '<p>Unregistered SW at scope: ' + registration.scope + ' (' + boolean + ')</p>';
+                    });
+                }
+                setTimeout(() => {
+                    caches.keys().then(function (names) {
+                        for (let name of names)
+                            caches.delete(name);
+                        document.body.innerHTML += '<p>Caches Cleared.</p>';
+                        document.body.innerHTML += '<h2><a href="/app/?v=18_9_1&f=true">>>> CLICK HERE TO OPEN REFRESHED APP <<<</a></h2>';
+                    });
+                }, 500);
+
+            });
+        }
+    </script>
+</body>
+
+</html>

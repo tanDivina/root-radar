@@ -4,34 +4,40 @@ import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 
 class GardenEndpoint extends Endpoint {
   @override
-  bool get requireLogin => true;
+  bool get requireLogin => false;
 
   Future<void> savePlant(Session session, Plant plant) async {
     final authInfo = session.authenticated;
-    if (authInfo == null) return;
+    // if (authInfo == null) return;
+    final userId = authInfo?.userId ?? 1;
 
-    plant.userInfoId = authInfo.userId;
+    plant.userInfoId = userId;
     await Plant.db.insertRow(session, plant);
   }
 
   Future<List<Plant>> getAllPlants(Session session) async {
+    print('GardenEndpoint.getAllPlants called');
     final authInfo = session.authenticated;
-    if (authInfo == null) return [];
+    print('Auth info: $authInfo');
+    // if (authInfo == null) return [];
+    final userId = authInfo?.userId ?? 1;
+    print('Using userId: $userId');
 
     return await Plant.db.find(
       session,
-      where: (t) => t.userInfoId.equals(authInfo.userId),
+      where: (t) => t.userInfoId.equals(userId),
       orderBy: (t) => t.plantedAt,
     );
   }
 
   Future<void> deletePlant(Session session, int id) async {
     final authInfo = session.authenticated;
-    if (authInfo == null) return;
+    // if (authInfo == null) return;
+    final userId = authInfo?.userId ?? 1;
 
     await Plant.db.deleteWhere(
       session,
-      where: (t) => t.id.equals(id) & t.userInfoId.equals(authInfo.userId),
+      where: (t) => t.id.equals(id) & t.userInfoId.equals(userId),
     );
   }
 

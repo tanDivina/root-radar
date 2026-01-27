@@ -13,14 +13,18 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../auth/email_idp_endpoint.dart' as _i2;
 import '../auth/jwt_refresh_endpoint.dart' as _i3;
-import '../greetings/greeting_endpoint.dart' as _i4;
-import '../plants/garden_endpoint.dart' as _i5;
-import 'package:root_radar_server/src/generated/plants/plant.dart' as _i6;
+import '../endpoints/butler_endpoint.dart' as _i4;
+import '../endpoints/debug_endpoint.dart' as _i5;
+import '../endpoints/demo_endpoint.dart' as _i6;
+import '../endpoints/weather_endpoint.dart' as _i7;
+import '../greetings/greeting_endpoint.dart' as _i8;
+import '../plants/garden_endpoint.dart' as _i9;
+import 'package:root_radar_server/src/generated/plants/plant.dart' as _i10;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
-    as _i7;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i8;
+    as _i11;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i12;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
-    as _i9;
+    as _i13;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -38,13 +42,37 @@ class Endpoints extends _i1.EndpointDispatch {
           'jwtRefresh',
           null,
         ),
-      'greeting': _i4.GreetingEndpoint()
+      'butler': _i4.ButlerEndpoint()
+        ..initialize(
+          server,
+          'butler',
+          null,
+        ),
+      'debug': _i5.DebugEndpoint()
+        ..initialize(
+          server,
+          'debug',
+          null,
+        ),
+      'demo': _i6.DemoEndpoint()
+        ..initialize(
+          server,
+          'demo',
+          null,
+        ),
+      'weather': _i7.WeatherEndpoint()
+        ..initialize(
+          server,
+          'weather',
+          null,
+        ),
+      'greeting': _i8.GreetingEndpoint()
         ..initialize(
           server,
           'greeting',
           null,
         ),
-      'garden': _i5.GardenEndpoint()
+      'garden': _i9.GardenEndpoint()
         ..initialize(
           server,
           'garden',
@@ -245,6 +273,95 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
+    connectors['butler'] = _i1.EndpointConnector(
+      name: 'butler',
+      endpoint: endpoints['butler']!,
+      methodConnectors: {
+        'getMessages': _i1.MethodConnector(
+          name: 'getMessages',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['butler'] as _i4.ButlerEndpoint)
+                  .getMessages(session),
+        ),
+        'triggerBriefing': _i1.MethodConnector(
+          name: 'triggerBriefing',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['butler'] as _i4.ButlerEndpoint)
+                  .triggerBriefing(session),
+        ),
+      },
+    );
+    connectors['debug'] = _i1.EndpointConnector(
+      name: 'debug',
+      endpoint: endpoints['debug']!,
+      methodConnectors: {
+        'triggerMorningBriefing': _i1.MethodConnector(
+          name: 'triggerMorningBriefing',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['debug'] as _i5.DebugEndpoint)
+                  .triggerMorningBriefing(session),
+        ),
+      },
+    );
+    connectors['demo'] = _i1.EndpointConnector(
+      name: 'demo',
+      endpoint: endpoints['demo']!,
+      methodConnectors: {
+        'seedPlants': _i1.MethodConnector(
+          name: 'seedPlants',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['demo'] as _i6.DemoEndpoint).seedPlants(session),
+        ),
+      },
+    );
+    connectors['weather'] = _i1.EndpointConnector(
+      name: 'weather',
+      endpoint: endpoints['weather']!,
+      methodConnectors: {
+        'getWeather': _i1.MethodConnector(
+          name: 'getWeather',
+          params: {
+            'lat': _i1.ParameterDescription(
+              name: 'lat',
+              type: _i1.getType<double>(),
+              nullable: false,
+            ),
+            'lon': _i1.ParameterDescription(
+              name: 'lon',
+              type: _i1.getType<double>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['weather'] as _i7.WeatherEndpoint).getWeather(
+                    session,
+                    params['lat'],
+                    params['lon'],
+                  ),
+        ),
+      },
+    );
     connectors['greeting'] = _i1.EndpointConnector(
       name: 'greeting',
       endpoint: endpoints['greeting']!,
@@ -262,7 +379,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['greeting'] as _i4.GreetingEndpoint).hello(
+              ) async => (endpoints['greeting'] as _i8.GreetingEndpoint).hello(
                 session,
                 params['name'],
               ),
@@ -278,7 +395,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'plant': _i1.ParameterDescription(
               name: 'plant',
-              type: _i1.getType<_i6.Plant>(),
+              type: _i1.getType<_i10.Plant>(),
               nullable: false,
             ),
           },
@@ -286,7 +403,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['garden'] as _i5.GardenEndpoint).savePlant(
+              ) async => (endpoints['garden'] as _i9.GardenEndpoint).savePlant(
                 session,
                 params['plant'],
               ),
@@ -298,7 +415,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['garden'] as _i5.GardenEndpoint)
+              ) async => (endpoints['garden'] as _i9.GardenEndpoint)
                   .getAllPlants(session),
         ),
         'deletePlant': _i1.MethodConnector(
@@ -315,7 +432,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['garden'] as _i5.GardenEndpoint).deletePlant(
+                  (endpoints['garden'] as _i9.GardenEndpoint).deletePlant(
                     session,
                     params['id'],
                   ),
@@ -333,7 +450,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['garden'] as _i5.GardenEndpoint)
+              ) async => (endpoints['garden'] as _i9.GardenEndpoint)
                   .getUploadDescription(
                     session,
                     params['path'],
@@ -353,17 +470,17 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['garden'] as _i5.GardenEndpoint).verifyUpload(
+                  (endpoints['garden'] as _i9.GardenEndpoint).verifyUpload(
                     session,
                     params['path'],
                   ),
         ),
       },
     );
-    modules['serverpod_auth_idp'] = _i7.Endpoints()
+    modules['serverpod_auth_idp'] = _i11.Endpoints()
       ..initializeEndpoints(server);
-    modules['serverpod_auth'] = _i8.Endpoints()..initializeEndpoints(server);
-    modules['serverpod_auth_core'] = _i9.Endpoints()
+    modules['serverpod_auth'] = _i12.Endpoints()..initializeEndpoints(server);
+    modules['serverpod_auth_core'] = _i13.Endpoints()
       ..initializeEndpoints(server);
   }
 }

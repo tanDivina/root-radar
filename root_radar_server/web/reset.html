@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Reset Service Workers</title>
+</head>
+
+<body>
+    <h1>Resetting Application State...</h1>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                for (let registration of registrations) {
+                    registration.unregister();
+                    console.log('Unregistered service worker:', registration);
+                }
+                document.body.innerHTML += '<p>Service Workers Unregistered.</p>';
+                caches.keys().then(function (names) {
+                    for (let name of names)
+                        caches.delete(name);
+                    document.body.innerHTML += '<p>Caches Cleared.</p>';
+                    document.body.innerHTML += '<p><strong>Please go to <a href="/app/red/index.html">THE RED APP</a> now.</strong></p>';
+                });
+            });
+        } else {
+            document.body.innerHTML += '<p>No service workers supported.</p>';
+        }
+    </script>
+</body>
+
+</html>

@@ -19,24 +19,48 @@ class MorningBriefingCall extends FutureCall {
       final weather = await weatherService.getForecast(session, lat, lon);
 
       if (weather.isHeatwave) {
-        session.log(
-          'BUTLER MESSAGE [User ${plant.userInfoId}]: Sir, it is ${weather.temperature}°C and ${weather.condition} at the location of your "${plant.name}". '
-          'I suggest extra water today.',
-          level: LogLevel.info,
-        );
+        final msg = 'Sir, it is ${weather.temperature}°C and ${weather.condition} at the location of your "${plant.name}". I suggest extra water today.';
+        session.log('BUTLER MESSAGE: $msg', level: LogLevel.info);
+        await ButlerMessage.db.insertRow(session, ButlerMessage(
+            message: msg,
+            timestamp: DateTime.now(),
+            type: 'weather',
+            userInfoId: plant.userInfoId ?? 1,
+        ));
       }
 
       // Growth Milestones
       final daysSincePlanted = DateTime.now().difference(plant.plantedAt).inDays;
       
       if (daysSincePlanted == 7) {
-        session.log('BUTLER MESSAGE [User ${plant.userInfoId}]: Sir, your "${plant.name}" should be sprouting this week!', level: LogLevel.info);
+        final msg = 'Sir, your "${plant.name}" should be sprouting this week!';
+        session.log('BUTLER MESSAGE: $msg', level: LogLevel.info);
+         await ButlerMessage.db.insertRow(session, ButlerMessage(
+            message: msg,
+            timestamp: DateTime.now(),
+            type: 'info',
+            userInfoId: plant.userInfoId ?? 1,
+        ));
       } else if (plant.daysToHarvest != null) {
         final daysLeft = plant.daysToHarvest! - daysSincePlanted;
         if (daysLeft == 0) {
-          session.log('BUTLER MESSAGE [User ${plant.userInfoId}]: Excellent news, Sir! Your "${plant.name}" is ready for harvest.', level: LogLevel.info);
+          final msg = 'Excellent news, Sir! Your "${plant.name}" is ready for harvest.';
+          session.log('BUTLER MESSAGE: $msg', level: LogLevel.info);
+           await ButlerMessage.db.insertRow(session, ButlerMessage(
+            message: msg,
+            timestamp: DateTime.now(),
+            type: 'alert',
+            userInfoId: plant.userInfoId ?? 1,
+        ));
         } else if (daysLeft == 7) {
-          session.log('BUTLER MESSAGE [User ${plant.userInfoId}]: Sir, the "${plant.name}" is entering its final week before harvest.', level: LogLevel.info);
+          final msg = 'Sir, the "${plant.name}" is entering its final week before harvest.';
+          session.log('BUTLER MESSAGE: $msg', level: LogLevel.info);
+           await ButlerMessage.db.insertRow(session, ButlerMessage(
+            message: msg,
+            timestamp: DateTime.now(),
+            type: 'info',
+            userInfoId: plant.userInfoId ?? 1,
+        ));
         }
       }
     }
