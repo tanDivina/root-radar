@@ -138,4 +138,85 @@ ${sb.toString()}
             userInfoId: userId,
         ));
   }
+
+  Future<void> chatWithButler(Session session, int userId, String userMessage) async {
+    // 1. Log User Message
+    await _logMessage(session, userId, userMessage, 'user');
+
+    // 2. Fetch Context (Plants & Weather)
+    final plants = await Plant.db.find(
+      session,
+      where: (t) => t.userInfoId.equals(userId),
+    );
+
+    final apiKey = session.serverpod.getPassword('geminiApiKey');
+    if (apiKey == null || apiKey.isEmpty || apiKey == 'PASTE_YOUR_KEY_HERE') {
+      await _logMessage(session, userId, "I'm terribly sorry, Sir, but my cognitive modules are currently offline (Missing API Key).", 'alert');
+      return;
+    }
+
+    try {
+      final model = GenerativeModel(model: 'gemini-2.5-flash-lite', apiKey: apiKey);
+
+      // 3. Fetch History (last 5 messages)
+      final history = await ButlerMessage.db.find(
+        session,
+        where: (t) => t.userInfoId.equals(userId),
+        orderBy: (t) => t.timestamp,
+        orderDescending: true,
+        limit: 10,
+      );
+      
+      final historyStrings = history.reversed.map((m) {
+        final role = m.type == 'user' ? "User" : "Butler";
+        return "$role: ${m.message}";
+      }).join("\n");
+
+      // 4. Build Garden Data context
+      final sb = StringBuffer();
+      for (final plant in plants) {
+        final daysOld = DateTime.now().difference(plant.plantedAt).inDays;
+        sb.writeln("- ${plant.name} (${plant.variety ?? 'Common'}): $daysOld days old. Notes: ${plant.notes ?? 'None'}");
+      }
+
+      String weatherInfo = "Unknown";
+      if (plants.isNotEmpty) {
+         final p = plants.first;
+         final weather = await _weatherService.getForecast(session, p.latitude ?? 0, p.longitude ?? 0);
+         weatherInfo = "${weather.temperature}°C, ${weather.condition}";
+      }
+
+      final prompt = [
+        Content.text('''
+You are the "Garden Butler", a witty, loyal, and slightly formal British butler.
+You are having a conversation with the user (Sir/Ma'am).
+
+Context:
+Gardening Data:
+${sb.toString()}
+Local Weather: $weatherInfo
+
+Recent Conversation History:
+$historyStrings
+
+Task:
+Respond to the user's latest message as the Butler. 
+Keep it concise (1-3 sentences), helpful, and stay in character.
+If they ask about a specific plant, use the data provided.
+
+User's Latest Message: $userMessage
+''')
+      ];
+
+      final response = await model.generateContent(prompt);
+      final text = response.text;
+
+      if (text != null) {
+        await _logMessage(session, userId, text, 'info');
+      }
+    } catch (e, stack) {
+      session.log('Chat API Error: $e', level: LogLevel.error, stackTrace: stack);
+      await _logMessage(session, userId, "My apologies, Sir. It seems I've had a brief lapse in concentration. ($e)", 'alert');
+    }
+  }
 }

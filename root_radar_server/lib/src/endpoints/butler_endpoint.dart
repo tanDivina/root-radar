@@ -40,4 +40,17 @@ class ButlerEndpoint extends Endpoint {
       rethrow;
     }
   }
+
+  Future<void> chatWithButler(Session session, String message) async {
+    try {
+      final userId = session.authenticated?.userId ?? 1;
+      session.log('User $userId sending message to Butler: $message', level: LogLevel.info);
+
+      final butler = ButlerService();
+      await butler.chatWithButler(session, userId, message);
+    } catch (e, stack) {
+      session.log('Error in chatWithButler: $e', level: LogLevel.error, stackTrace: stack);
+      rethrow;
+    }
+  }
 }
