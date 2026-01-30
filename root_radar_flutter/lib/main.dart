@@ -31,7 +31,7 @@ void main() async {
           children: [
             CircularProgressIndicator(),
             SizedBox(height: 20),
-            Text('Root Radar v7.1.0 - LATEST'),
+            Text('Root Radar v7.1.2 - LATEST'),
             Text('Syncing with Garden Butler...'),
           ],
         ),
@@ -80,7 +80,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Root Radar v7.1.0',
+      title: 'Root Radar v7.1.2',
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(

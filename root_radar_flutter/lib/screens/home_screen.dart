@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return SignInScreen(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Root Radar v7.1.0'),
+          title: const Text('Root Radar v7.1.2'),
           backgroundColor: Colors.green.shade800,
           foregroundColor: Colors.white,
           actions: [
