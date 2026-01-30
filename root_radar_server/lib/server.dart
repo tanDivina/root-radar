@@ -89,9 +89,10 @@ void run(List<String> args) async {
   // Using PopupFriendlyFlutterRoute instead of FlutterRoute to fix
   // Google Sign-In popup communication (COOP: same-origin-allow-popups).
   pod.webServer.addRoute(
-    PopupFriendlyFlutterRoute(
-      Directory(Uri(path: 'web/app').toFilePath()),
-    ),
+    // PopupFriendlyFlutterRoute(
+    //   Directory(Uri(path: 'web/app').toFilePath()),
+    // ),
+    StaticRoute.directory(Directory(Uri(path: 'web/app').toFilePath())),
     '/app',
   );
 
