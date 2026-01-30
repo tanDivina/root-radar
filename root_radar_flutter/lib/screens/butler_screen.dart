@@ -137,6 +137,13 @@ class _ButlerScreenState extends State<ButlerScreen> {
                         decoration: BoxDecoration(
                           color: Colors.blueGrey.shade800,
                           borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.blue.withOpacity(0.6),
+                              blurRadius: 10,
+                              spreadRadius: 1,
+                            ),
+                          ],
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,

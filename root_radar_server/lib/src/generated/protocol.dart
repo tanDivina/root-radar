@@ -29,6 +29,8 @@ import 'weather_data.dart' as _i14;
 import 'package:root_radar_server/src/generated/butler_message.dart' as _i15;
 import 'package:root_radar_server/src/generated/plants/plant.dart' as _i16;
 import 'package:root_radar_server/src/generated/plant_photo.dart' as _i17;
+import 'package:root_radar_server/src/generated/maintenance_log.dart' as _i18;
+import 'package:root_radar_server/src/generated/fermentation.dart' as _i19;
 export 'butler_message.dart';
 export 'cacao_batch.dart';
 export 'fermentation.dart';
@@ -667,6 +669,18 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (t == List<_i17.PlantPhoto>) {
       return (data as List).map((e) => deserialize<_i17.PlantPhoto>(e)).toList()
+          as T;
+    }
+    if (t == List<_i18.MaintenanceLog>) {
+      return (data as List)
+              .map((e) => deserialize<_i18.MaintenanceLog>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i19.Fermentation>) {
+      return (data as List)
+              .map((e) => deserialize<_i19.Fermentation>(e))
+              .toList()
           as T;
     }
     try {

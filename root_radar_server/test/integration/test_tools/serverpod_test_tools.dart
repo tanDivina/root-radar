@@ -21,6 +21,8 @@ import 'package:root_radar_server/src/generated/weather_data.dart' as _i6;
 import 'package:root_radar_server/src/generated/greetings/greeting.dart' as _i7;
 import 'package:root_radar_server/src/generated/plants/plant.dart' as _i8;
 import 'package:root_radar_server/src/generated/plant_photo.dart' as _i9;
+import 'package:root_radar_server/src/generated/maintenance_log.dart' as _i10;
+import 'package:root_radar_server/src/generated/fermentation.dart' as _i11;
 import 'package:root_radar_server/src/generated/protocol.dart';
 import 'package:root_radar_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -956,6 +958,67 @@ class _GardenEndpoint {
                   _localCallContext.arguments,
                 )
                 as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i10.MaintenanceLog>> getLogsForPlant(
+    _i1.TestSessionBuilder sessionBuilder,
+    int plantId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'garden',
+            method: 'getLogsForPlant',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'garden',
+          methodName: 'getLogsForPlant',
+          parameters: _i1.testObjectToJson({'plantId': plantId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i10.MaintenanceLog>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i11.Fermentation>> getAllFermentations(
+    _i1.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'garden',
+            method: 'getAllFermentations',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'garden',
+          methodName: 'getAllFermentations',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i11.Fermentation>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

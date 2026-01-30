@@ -12,7 +12,7 @@ class DemoEndpoint extends Endpoint {
     final userId = authInfo?.userId ?? 1;
 
     // 2. Insert Demo Plants at Finca Montezuma
-    final centerLat = 9.22475;
+    final centerLat = 9.22475; // Finca Montezuma
     final centerLng = -82.25749;
 
     // Reset demo plants to ensure they appear at the correct locations
@@ -79,16 +79,30 @@ class DemoEndpoint extends Endpoint {
         final p = await Plant.db.insertRow(session, plant);
         print('Successfully inserted ${plant.name}');
         
-        // Add a flowering log for one plant to test prediction
+        // Add rich maintenance logs
         if (plant.name == 'Theobroma Cacao') {
-           print('Logging flowering for Cacao...');
            await MaintenanceLog.db.insertRow(session, MaintenanceLog(
              plantId: p.id!,
              type: 'Flowering',
-             timestamp: DateTime.now().subtract(const Duration(days: 150)), // ~5 months ago
+             timestamp: DateTime.now().subtract(const Duration(days: 150)), 
+             notes: 'First major flowering of the season. 80% canopy coverage.',
              userInfoId: userId,
            ));
-           print('Flowering log inserted.');
+           await MaintenanceLog.db.insertRow(session, MaintenanceLog(
+             plantId: p.id!,
+             type: 'Pruning',
+             timestamp: DateTime.now().subtract(const Duration(days: 30)),
+             notes: 'Maintenance pruning to improve airflow and reduce fungal risk.',
+             userInfoId: userId,
+           ));
+        } else if (plant.name == 'Banana') {
+           await MaintenanceLog.db.insertRow(session, MaintenanceLog(
+             plantId: p.id!,
+             type: 'Fertilizing',
+             timestamp: DateTime.now().subtract(const Duration(days: 10)),
+             notes: 'Applied organic potassium booster.',
+             userInfoId: userId,
+           ));
         }
       }
 
@@ -113,8 +127,30 @@ class DemoEndpoint extends Endpoint {
       ];
 
       for (var batch in demoBatches) {
-        await CacaoBatch.db.insertRow(session, batch);
+        final b = await CacaoBatch.db.insertRow(session, batch);
         print('Successfully inserted Batch ${batch.name}');
+
+        // Add dummy fermentation log
+        await Fermentation.db.insertRow(session, Fermentation(
+          name: '${batch.name} - Initial Turn',
+          status: 'Fermenting',
+          userInfoId: userId,
+          instructions: 'Turn daily for 6 days', 
+          startedAt: DateTime.now().subtract(const Duration(days: 1)),
+          nextTurnAt: DateTime.now().add(const Duration(hours: 12)),
+          notes: 'Standard turn. Temperature 42°C. Smell is fruity/acidic.',
+        ));
+        
+        if (batch.status == 'Drying') {
+             await Fermentation.db.insertRow(session, Fermentation(
+              name: '${batch.name} - Transfer to Drying',
+              status: 'Drying',
+              userInfoId: userId,
+              instructions: 'Monitor rain risk', 
+              startedAt: DateTime.now().subtract(const Duration(days: 3)),
+              notes: 'Moved to solar dryer. Beans fully purple/brown.',
+            ));
+        }
       }
 
       print('Demo data seeding complete');

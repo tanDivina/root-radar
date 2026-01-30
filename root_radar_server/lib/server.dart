@@ -31,7 +31,8 @@ void run(List<String> args) async {
       JwtConfigFromPasswords(),
     ],
     identityProviderBuilders: [
-      // Configure the email identity provider for email/password authentication.
+      /* 
+      // DISABLED TO PREVENT CRASH ON CLOUD (Missing secrets)
       EmailIdpConfigFromPasswords(
         registrationVerificationCodeGenerator: () => '000000',
         passwordResetVerificationCodeGenerator: () => '000000',
@@ -40,7 +41,6 @@ void run(List<String> args) async {
             required accountRequestId,
             required verificationCode,
             required transaction}) async {
-          // Email sending disabled for demo/testing. Use '000000'.
           print('Registration code for $email: $verificationCode');
         },
         sendPasswordResetVerificationCode: (session,
@@ -52,8 +52,8 @@ void run(List<String> args) async {
               session, email, verificationCode);
         },
       ),
-      // Configure the Google identity provider for Google sign-in.
       GoogleIdpConfigFromPasswords(),
+      */
     ],
   );
 

@@ -28,5 +28,7 @@ garden:
   - deletePlant:
   - getPhotosForPlant:
   - savePlantPhoto:
+  - getLogsForPlant:
+  - getAllFermentations:
   - getUploadDescription:
   - verifyUpload:

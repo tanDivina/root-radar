@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:root_radar_client/root_radar_client.dart';
 import 'package:intl/intl.dart';
 import '../services/demo_plant_service.dart';
-import 'radar_screen.dart'; // To reuse the AddPlantSheet
+import '../main.dart'; // For client
+import 'add_plant_sheet.dart'; 
+import 'photo_timeline_screen.dart';
+import 'package:image_picker/image_picker.dart'; // For XFile
+import 'plant_log_screen.dart';
 
 class PlantListScreen extends StatefulWidget {
   final bool showHeader;
@@ -164,6 +168,13 @@ class _PlantListScreenState extends State<PlantListScreen> {
                   onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => PhotoTimelineScreen(plant: plant)),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.article, color: Colors.orange),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PlantLogScreen(plant: plant)),
                   ),
                 ),
                 IconButton(

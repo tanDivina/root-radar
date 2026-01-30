@@ -21,8 +21,10 @@ import 'package:root_radar_client/src/protocol/weather_data.dart' as _i6;
 import 'package:root_radar_client/src/protocol/greetings/greeting.dart' as _i7;
 import 'package:root_radar_client/src/protocol/plants/plant.dart' as _i8;
 import 'package:root_radar_client/src/protocol/plant_photo.dart' as _i9;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i10;
-import 'protocol.dart' as _i11;
+import 'package:root_radar_client/src/protocol/maintenance_log.dart' as _i10;
+import 'package:root_radar_client/src/protocol/fermentation.dart' as _i11;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i12;
+import 'protocol.dart' as _i13;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -403,6 +405,20 @@ class EndpointGarden extends _i2.EndpointRef {
         {'photo': photo},
       );
 
+  _i3.Future<List<_i10.MaintenanceLog>> getLogsForPlant(int plantId) =>
+      caller.callServerEndpoint<List<_i10.MaintenanceLog>>(
+        'garden',
+        'getLogsForPlant',
+        {'plantId': plantId},
+      );
+
+  _i3.Future<List<_i11.Fermentation>> getAllFermentations() =>
+      caller.callServerEndpoint<List<_i11.Fermentation>>(
+        'garden',
+        'getAllFermentations',
+        {},
+      );
+
   _i3.Future<String?> getUploadDescription(String path) =>
       caller.callServerEndpoint<String?>(
         'garden',
@@ -420,13 +436,13 @@ class EndpointGarden extends _i2.EndpointRef {
 class Modules {
   Modules(Client client) {
     serverpod_auth_idp = _i1.Caller(client);
-    auth = _i10.Caller(client);
+    auth = _i12.Caller(client);
     serverpod_auth_core = _i4.Caller(client);
   }
 
   late final _i1.Caller serverpod_auth_idp;
 
-  late final _i10.Caller auth;
+  late final _i12.Caller auth;
 
   late final _i4.Caller serverpod_auth_core;
 }
@@ -451,7 +467,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i11.Protocol(),
+         _i13.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,

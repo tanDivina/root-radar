@@ -533,6 +533,35 @@ class Endpoints extends _i1.EndpointDispatch {
                     params['photo'],
                   ),
         ),
+        'getLogsForPlant': _i1.MethodConnector(
+          name: 'getLogsForPlant',
+          params: {
+            'plantId': _i1.ParameterDescription(
+              name: 'plantId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['garden'] as _i10.GardenEndpoint).getLogsForPlant(
+                    session,
+                    params['plantId'],
+                  ),
+        ),
+        'getAllFermentations': _i1.MethodConnector(
+          name: 'getAllFermentations',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['garden'] as _i10.GardenEndpoint)
+                  .getAllFermentations(session),
+        ),
         'getUploadDescription': _i1.MethodConnector(
           name: 'getUploadDescription',
           params: {

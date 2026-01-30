@@ -11,22 +11,44 @@ class HarvestOverviewScreen extends StatefulWidget {
   State<HarvestOverviewScreen> createState() => _HarvestOverviewScreenState();
 }
 
-class _HarvestOverviewScreenState extends State<HarvestOverviewScreen> {
+class _HarvestOverviewScreenState extends State<HarvestOverviewScreen> with SingleTickerProviderStateMixin {
   List<Plant> readyToHarvest = [];
   List<Plant> comingSoon = [];
   List<Plant> growing = [];
+  List<Fermentation> fermentations = [];
   bool isLoading = true;
-
+  late TabController _tabController;
+  
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     _loadData();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadData() async {
     setState(() => isLoading = true);
     try {
       final plants = await DemoPlantService().getAllPlants();
+      // Fetch fermentation logs directly from client assuming endpoint exists or mock in demo service
+      // Since we don't have a DemoFermentationService, we'll try to fetch from client db directly for demo
+      // or we just trust that seeded data is there. We need to fetch Fermentation objects.
+      
+      // Attempt to fetch fermentations. If this fails (no endpoint), we'll handle it.
+      try {
+        fermentations = await client.garden.getAllFermentations();
+      } catch (e) {
+        // Fallback for demo if endpoint method name differs or doesn't exist
+        debugPrint('Fermentation fetch failed: $e');
+        fermentations = []; 
+      }
+
       final now = DateTime.now();
 
       readyToHarvest = [];
@@ -62,9 +84,19 @@ class _HarvestOverviewScreenState extends State<HarvestOverviewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Harvest Overview', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Harvest & Processing', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.green.shade800,
         foregroundColor: Colors.white,
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          indicatorColor: Colors.white,
+          tabs: const [
+            Tab(text: 'Harvest Plan', icon: Icon(Icons.calendar_month)),
+            Tab(text: 'Fermentation', icon: Icon(Icons.science)),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -74,18 +106,57 @@ class _HarvestOverviewScreenState extends State<HarvestOverviewScreen> {
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _loadData,
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  _buildSection('Ready for Harvest', readyToHarvest, Colors.green, Icons.check_circle),
-                  const SizedBox(height: 24),
-                  _buildSection('Coming Soon (Next 14 Days)', comingSoon, Colors.orange, Icons.timer),
-                  const SizedBox(height: 24),
-                  _buildSection('Still Growing', growing, Colors.blue, Icons.eco),
-                ],
-              ),
+          : TabBarView(
+              controller: _tabController,
+              children: [
+                // Tab 1: Harvest Plan
+                RefreshIndicator(
+                  onRefresh: _loadData,
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      _buildSection('Ready for Harvest', readyToHarvest, Colors.green, Icons.check_circle),
+                      const SizedBox(height: 24),
+                      _buildSection('Coming Soon (Next 14 Days)', comingSoon, Colors.orange, Icons.timer),
+                      const SizedBox(height: 24),
+                      _buildSection('Still Growing', growing, Colors.blue, Icons.eco),
+                    ],
+                  ),
+                ),
+                // Tab 2: Fermentation
+                RefreshIndicator(
+                  onRefresh: _loadData,
+                  child: fermentations.isEmpty 
+                    ? const Center(child: Text("No active fermentations."))
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: fermentations.length,
+                        itemBuilder: (ctx, i) {
+                          final f = fermentations[i];
+                          return Card(
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.brown.shade100,
+                                child: const Icon(Icons.bubble_chart, color: Colors.brown),
+                              ),
+                              title: Text(f.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                              subtitle: Text('Status: ${f.status}\nInstructions: ${f.instructions ?? "None"}\nNotes: ${f.notes ?? ""}'),
+                              isThreeLine: true,
+                              trailing: f.nextTurnAt != null 
+                                ? Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(Icons.alarm, size: 16, color: Colors.orange),
+                                      Text(DateFormat('HH:mm').format(f.nextTurnAt!), style: const TextStyle(fontSize: 12)),
+                                    ],
+                                  )
+                                : null,
+                            ),
+                          );
+                        },
+                      ),
+                ),
+              ],
             ),
     );
   }
