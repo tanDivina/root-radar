@@ -1,4 +1,5 @@
 import 'package:serverpod/serverpod.dart';
+import 'dart:io';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import '../services/weather_service.dart';
 import '../services/tide_service.dart';
@@ -23,7 +24,10 @@ class ButlerService {
     }
 
     // 2. Try AI Generation
-    final apiKey = session.serverpod.getPassword('geminiApiKey');
+    // Check Env Var first, then Secrets
+    String? apiKey = Platform.environment['GEMINI_API_KEY'];
+    apiKey ??= session.serverpod.getPassword('geminiApiKey');
+
     if (apiKey != null && apiKey.isNotEmpty) {
       if (apiKey == 'PASTE_YOUR_KEY_HERE') {
          await _logMessage(session, userId, "[DEBUG] Error: API Key is still the placeholder text.", 'alert');
@@ -173,7 +177,8 @@ ${sb.toString()}
     // 1. Log User Message
     await _logMessage(session, userId, userMessage, 'user');
 
-    final apiKey = session.serverpod.getPassword('geminiApiKey');
+    String? apiKey = Platform.environment['GEMINI_API_KEY'];
+    apiKey ??= session.serverpod.getPassword('geminiApiKey');
     if (apiKey == null || apiKey.isEmpty || apiKey == 'PASTE_YOUR_KEY_HERE') {
       await _logMessage(session, userId, "I'm terribly sorry, Sir, but my cognitive modules are currently offline (Missing API Key).", 'alert');
       return;
