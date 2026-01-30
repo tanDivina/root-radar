@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
+import 'package:root_radar_client/root_radar_client.dart';
 import '../main.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -12,30 +12,48 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  bool _isSignedIn = false;
+  bool _demoMode = false;
+  bool _isSeeding = false;
 
   @override
   void initState() {
     super.initState();
-    client.auth.authInfoListenable.addListener(_updateSignedInState);
-    _isSignedIn = client.auth.isAuthenticated;
   }
 
   @override
   void dispose() {
-    client.auth.authInfoListenable.removeListener(_updateSignedInState);
     super.dispose();
   }
 
-  void _updateSignedInState() {
-    setState(() {
-      _isSignedIn = client.auth.isAuthenticated;
-    });
+
+
+  Future<void> _seedDemoData() async {
+    setState(() => _isSeeding = true);
+    try {
+      // Use the dedicated demo endpoint to seed data reliably
+      await client.demo.seedPlants();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Demo data prepared. Welcome!')),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error seeding demo data: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Quick access enabled (Offline/Seeding issue: $e)')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSeeding = false);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isSignedIn) {
+    if (_demoMode) {
       return widget.child;
     }
 
@@ -53,7 +71,10 @@ class _SignInScreenState extends State<SignInScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.radar, size: 100, color: Colors.white),
+                Image.asset(
+                  'assets/images/mascot.png',
+                  height: 150,
+                ),
                 const SizedBox(height: 20),
                 const Text(
                   'Root Radar',
@@ -65,7 +86,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  'Your AI Gardening Assistant',
+                  'Your AI Gardening Assistant (v7.1.2)',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white70,
@@ -83,8 +104,44 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(24),
-                        child: EmailSignInWidget(
-                          client: client,
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 24),
+                            // Demo Mode as the primary action
+                            ElevatedButton.icon(
+                              onPressed: _isSeeding ? null : () async {
+                                await _seedDemoData();
+                                setState(() {
+                                  _demoMode = true;
+                                });
+                              },
+                              icon: _isSeeding 
+                                ? const SizedBox(
+                                    height: 18, 
+                                    width: 18, 
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Icon(Icons.play_arrow),
+                              label: Text(_isSeeding ? 'Loading...' : 'Try Root Radar'),
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: const Size(double.infinity, 55),
+                                backgroundColor: Colors.green.shade700,
+                                foregroundColor: Colors.white,
+                                textStyle: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'Click to explore with demo data',
+                              style: TextStyle(color: Colors.grey, fontSize: 13),
+                            ),
+                          ],
                         ),
                       ),
                     ),

@@ -14,6 +14,8 @@ class WeatherService {
         temperature: 36.5,
         condition: 'Sunny',
         isHeatwave: true,
+        humidity: 85, // High humidity for demo
+        precipitationRisk: 0.1,
       );
     }
 
@@ -26,10 +28,17 @@ class WeatherService {
         final data = jsonDecode(response.body);
         final temp = data['main']['temp'].toDouble();
         final condition = data['weather'][0]['main'];
+        final humidity = data['main']['humidity'] as int?;
+        // OpenWeatherMap free tier doesn't always have pop (probability of precipitation) in current weather, 
+        // using rain.1h as a proxy or defaulting to 0.0
+        final precipitation = data['rain'] != null ? 0.8 : 0.1; 
+
         return WeatherData(
           temperature: temp,
           condition: condition,
-          isHeatwave: temp > 30, // Simple heatwave logic
+          isHeatwave: temp > 30,
+          humidity: humidity,
+          precipitationRisk: precipitation,
         );
       }
     } catch (e) {

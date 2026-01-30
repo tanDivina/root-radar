@@ -12,6 +12,7 @@ import 'src/web/routes/root.dart';
 import 'src/future_calls/morning_briefing_call.dart';
 import 'src/services/mail_service.dart';
 import 'src/web/routes/version_route.dart';
+import 'src/web/routes/popup_friendly_flutter_route.dart';
 import 'src/version.dart';
 
 /// The starting point of the Serverpod server.
@@ -52,7 +53,7 @@ void run(List<String> args) async {
         },
       ),
       // Configure the Google identity provider for Google sign-in.
-      // GoogleIdpConfigFromPasswords(),
+      GoogleIdpConfigFromPasswords(),
     ],
   );
 
@@ -82,12 +83,17 @@ void run(List<String> args) async {
   pod.webServer.addRoute(StaticRoute.directory(root), '/static');
 
   // Serve the flutter web app under the /app path.
+  // Using PopupFriendlyFlutterRoute instead of FlutterRoute to fix
+  // Google Sign-In popup communication (COOP: same-origin-allow-popups).
   pod.webServer.addRoute(
-    FlutterRoute(
+    PopupFriendlyFlutterRoute(
       Directory(Uri(path: 'web/app').toFilePath()),
     ),
     '/app',
   );
+
+  // DEBUG ROUTE - LIST FILES
+  pod.webServer.addRoute(DebugRoute(), '/debug-fs');
 
   // Register FutureCalls
   pod.registerFutureCall(MorningBriefingCall(), 'morningBriefing');
@@ -98,5 +104,25 @@ void run(List<String> args) async {
 
   // Trigger the first Morning Briefing 10 seconds after startup for testing
   pod.futureCallWithDelay('morningBriefing', null, const Duration(seconds: 10));
+}
+
+class DebugRoute extends Route {
+  @override
+  Future<Response> handleCall(Session session, Request request) async {
+    final dir = Directory.current;
+    final buffer = StringBuffer();
+    buffer.writeln('Current Directory: ${dir.path}');
+    try {
+      await for (final entity in dir.list(recursive: true)) {
+        buffer.writeln(entity.path);
+      }
+    } catch (e) {
+      buffer.writeln('Error listing files: $e');
+    }
+    return Response.ok(
+      body: Body.fromString(buffer.toString()),
+      headers: Headers.fromMap({'content-type': ['text/plain']}),
+    );
+  }
 }
 

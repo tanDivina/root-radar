@@ -1,0 +1,10 @@
+class: Harvest
+table: harvest
+fields:
+  name: String
+  plantId: int?
+  harvestedAt: DateTime
+  weight: double?
+  quality: String?
+  notes: String?
+  userInfoId: int?

@@ -20,6 +20,7 @@ import 'package:root_radar_server/src/generated/butler_message.dart' as _i5;
 import 'package:root_radar_server/src/generated/weather_data.dart' as _i6;
 import 'package:root_radar_server/src/generated/greetings/greeting.dart' as _i7;
 import 'package:root_radar_server/src/generated/plants/plant.dart' as _i8;
+import 'package:root_radar_server/src/generated/plant_photo.dart' as _i9;
 import 'package:root_radar_server/src/generated/protocol.dart';
 import 'package:root_radar_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -137,6 +138,8 @@ class TestEndpoints {
 
   late final _DemoEndpoint demo;
 
+  late final _GoogleIdpEndpoint googleIdp;
+
   late final _WeatherEndpoint weather;
 
   late final _GreetingEndpoint greeting;
@@ -168,6 +171,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     demo = _DemoEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    googleIdp = _GoogleIdpEndpoint(
       endpoints,
       serializationManager,
     );
@@ -545,6 +552,37 @@ class _ButlerEndpoint {
       }
     });
   }
+
+  _i3.Future<void> chatWithButler(
+    _i1.TestSessionBuilder sessionBuilder,
+    String message,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'butler',
+            method: 'chatWithButler',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'butler',
+          methodName: 'chatWithButler',
+          parameters: _i1.testObjectToJson({'message': message}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
 }
 
 class _DebugEndpoint {
@@ -557,20 +595,20 @@ class _DebugEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<void> triggerMorningBriefing(
+  _i3.Future<List<String>> listFiles(
     _i1.TestSessionBuilder sessionBuilder,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
             endpoint: 'debug',
-            method: 'triggerMorningBriefing',
+            method: 'listFiles',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'debug',
-          methodName: 'triggerMorningBriefing',
+          methodName: 'listFiles',
           parameters: _i1.testObjectToJson({}),
           serializationManager: _serializationManager,
         );
@@ -579,7 +617,7 @@ class _DebugEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<void>);
+                as _i3.Future<List<String>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -619,6 +657,52 @@ class _DemoEndpoint {
                   _localCallContext.arguments,
                 )
                 as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _GoogleIdpEndpoint {
+  _GoogleIdpEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<_i4.AuthSuccess> login(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required String idToken,
+    required String? accessToken,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'googleIdp',
+            method: 'login',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'googleIdp',
+          methodName: 'login',
+          parameters: _i1.testObjectToJson({
+            'idToken': idToken,
+            'accessToken': accessToken,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i4.AuthSuccess>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -802,6 +886,68 @@ class _GardenEndpoint {
           endpointPath: 'garden',
           methodName: 'deletePlant',
           parameters: _i1.testObjectToJson({'id': id}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i9.PlantPhoto>> getPhotosForPlant(
+    _i1.TestSessionBuilder sessionBuilder,
+    int plantId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'garden',
+            method: 'getPhotosForPlant',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'garden',
+          methodName: 'getPhotosForPlant',
+          parameters: _i1.testObjectToJson({'plantId': plantId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i9.PlantPhoto>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<void> savePlantPhoto(
+    _i1.TestSessionBuilder sessionBuilder,
+    _i9.PlantPhoto photo,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'garden',
+            method: 'savePlantPhoto',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'garden',
+          methodName: 'savePlantPhoto',
+          parameters: _i1.testObjectToJson({'photo': photo}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =

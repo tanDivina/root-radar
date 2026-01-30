@@ -41,6 +41,25 @@ class GardenEndpoint extends Endpoint {
     );
   }
 
+  Future<List<PlantPhoto>> getPhotosForPlant(Session session, int plantId) async {
+    final authInfo = session.authenticated;
+    final userId = authInfo?.userId ?? 1;
+
+    return await PlantPhoto.db.find(
+      session,
+      where: (t) => t.plantId.equals(plantId) & t.userInfoId.equals(userId),
+      orderBy: (t) => t.timestamp,
+    );
+  }
+
+  Future<void> savePlantPhoto(Session session, PlantPhoto photo) async {
+    final authInfo = session.authenticated;
+    final userId = authInfo?.userId ?? 1;
+
+    photo.userInfoId = userId;
+    await PlantPhoto.db.insertRow(session, photo);
+  }
+
   Future<String?> getUploadDescription(Session session, String path) async {
     return await session.storage.createDirectFileUploadDescription(
       storageId: 'public',

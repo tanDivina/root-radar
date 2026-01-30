@@ -5,7 +5,8 @@ import '../services/demo_plant_service.dart';
 import 'radar_screen.dart'; // To reuse the AddPlantSheet
 
 class PlantListScreen extends StatefulWidget {
-  const PlantListScreen({super.key});
+  final bool showHeader;
+  const PlantListScreen({super.key, this.showHeader = false});
 
   @override
   State<PlantListScreen> createState() => _PlantListScreenState();
@@ -37,29 +38,49 @@ class _PlantListScreenState extends State<PlantListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Garden', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.green.shade800,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadPlants,
-          ),
-        ],
-      ),
-      body: isLoading
+    final listWidget = isLoading
           ? const Center(child: CircularProgressIndicator())
           : plants.isEmpty
               ? _buildEmptyState()
-              : _buildPlantList(),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _onAddPlantPressed,
-        label: const Text('Add Plant'),
-        icon: const Icon(Icons.add),
-        backgroundColor: Colors.green.shade800,
-      ),
+              : _buildPlantList();
+
+    if (widget.showHeader) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('My Garden', style: TextStyle(fontWeight: FontWeight.bold)),
+          backgroundColor: Colors.green.shade800,
+          foregroundColor: Colors.white,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: _loadPlants,
+            ),
+          ],
+        ),
+        body: listWidget,
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: _onAddPlantPressed,
+          label: const Text('Add Plant'),
+          icon: const Icon(Icons.add),
+          backgroundColor: Colors.green.shade800,
+        ),
+      );
+    }
+
+    return Stack(
+      children: [
+        listWidget,
+        Positioned(
+          bottom: 16,
+          right: 16,
+          child: FloatingActionButton.extended(
+            onPressed: _onAddPlantPressed,
+            label: const Text('Add Plant'),
+            icon: const Icon(Icons.add),
+            backgroundColor: Colors.green.shade800,
+          ),
+        ),
+      ],
     );
   }
 
@@ -121,9 +142,13 @@ class _PlantListScreenState extends State<PlantListScreen> {
                 Text('${plant.category ?? "Plant"} - Planted: ${DateFormat('MMM dd, yyyy').format(plant.plantedAt)}'),
                 if (plant.variety != null && plant.variety!.isNotEmpty)
                   Text('Variety: ${plant.variety}'),
+                if (plant.daysToHarvest != null) ...[
+                  const SizedBox(height: 8),
+                  _buildHarvestProgress(plant),
+                ],
                 if (plant.notes != null && plant.notes!.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
+                    padding: const EdgeInsets.only(top: 8.0),
                     child: Text(
                       plant.notes!,
                       style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey.shade600),
@@ -131,14 +156,84 @@ class _PlantListScreenState extends State<PlantListScreen> {
                   ),
               ],
             ),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-              onPressed: () => _deletePlant(plant.id!),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.history, color: Colors.blue),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PhotoTimelineScreen(plant: plant)),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                  onPressed: () => _confirmDelete(plant),
+                ),
+              ],
             ),
           ),
         );
       },
     );
+  }
+
+  Widget _buildHarvestProgress(Plant plant) {
+    final daysSincePlanted = DateTime.now().difference(plant.plantedAt).inDays;
+    final progress = (daysSincePlanted / plant.daysToHarvest!).clamp(0.0, 1.0);
+    final daysLeft = plant.daysToHarvest! - daysSincePlanted;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              daysLeft <= 0 ? 'Ready for Harvest!' : '$daysLeft days until harvest',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: daysLeft <= 0 ? Colors.green.shade700 : Colors.orange.shade800,
+                fontSize: 12,
+              ),
+            ),
+            Text('${(progress * 100).toInt()}%', style: const TextStyle(fontSize: 12)),
+          ],
+        ),
+        const SizedBox(height: 4),
+        LinearProgressIndicator(
+          value: progress,
+          backgroundColor: Colors.grey.shade200,
+          valueColor: AlwaysStoppedAnimation<Color>(
+            daysLeft <= 0 ? Colors.green : Colors.orange,
+          ),
+          minHeight: 8,
+          borderRadius: BorderRadius.circular(4),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _confirmDelete(Plant plant) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove Plant?'),
+        content: Text('Are you sure you want to remove "${plant.name}" from your garden?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      _deletePlant(plant.id!);
+    }
   }
 
   Future<void> _onAddPlantPressed() async {

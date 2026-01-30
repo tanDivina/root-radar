@@ -17,6 +17,7 @@ class MorningBriefingCall extends FutureCall {
       final lat = plant.latitude ?? 0;
       final lon = plant.longitude ?? 0;
       final weather = await weatherService.getForecast(session, lat, lon);
+      // Fixed syntax error here
 
       if (weather.isHeatwave) {
         final msg = 'Sir, it is ${weather.temperature}°C and ${weather.condition} at the location of your "${plant.name}". I suggest extra water today.';

@@ -1,0 +1,8 @@
+class: MaintenanceLog
+table: maintenance_log
+fields:
+  plantId: int
+  type: String # Pruning, Flowering, Fertilizing
+  timestamp: DateTime
+  notes: String?
+  userInfoId: int?

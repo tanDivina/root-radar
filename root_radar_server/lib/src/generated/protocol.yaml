@@ -11,10 +11,13 @@ jwtRefresh:
 butler:
   - getMessages:
   - triggerBriefing:
+  - chatWithButler:
 debug:
-  - triggerMorningBriefing:
+  - listFiles:
 demo:
   - seedPlants:
+googleIdp:
+  - login:
 weather:
   - getWeather:
 greeting:
@@ -23,5 +26,7 @@ garden:
   - savePlant:
   - getAllPlants:
   - deletePlant:
+  - getPhotosForPlant:
+  - savePlantPhoto:
   - getUploadDescription:
   - verifyUpload:

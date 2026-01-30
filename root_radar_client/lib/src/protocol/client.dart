@@ -16,10 +16,13 @@ import 'package:serverpod_client/serverpod_client.dart' as _i2;
 import 'dart:async' as _i3;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _i4;
-import 'package:root_radar_client/src/protocol/greetings/greeting.dart' as _i5;
-import 'package:root_radar_client/src/protocol/plants/plant.dart' as _i6;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i7;
-import 'protocol.dart' as _i8;
+import 'package:root_radar_client/src/protocol/butler_message.dart' as _i5;
+import 'package:root_radar_client/src/protocol/weather_data.dart' as _i6;
+import 'package:root_radar_client/src/protocol/greetings/greeting.dart' as _i7;
+import 'package:root_radar_client/src/protocol/plants/plant.dart' as _i8;
+import 'package:root_radar_client/src/protocol/plant_photo.dart' as _i9;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i10;
+import 'protocol.dart' as _i11;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -235,6 +238,112 @@ class EndpointJwtRefresh extends _i4.EndpointRefreshJwtTokens {
   );
 }
 
+/// {@category Endpoint}
+class EndpointButler extends _i2.EndpointRef {
+  EndpointButler(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'butler';
+
+  _i3.Future<List<_i5.ButlerMessage>> getMessages() =>
+      caller.callServerEndpoint<List<_i5.ButlerMessage>>(
+        'butler',
+        'getMessages',
+        {},
+      );
+
+  _i3.Future<void> triggerBriefing() => caller.callServerEndpoint<void>(
+    'butler',
+    'triggerBriefing',
+    {},
+  );
+
+  _i3.Future<void> chatWithButler(String message) =>
+      caller.callServerEndpoint<void>(
+        'butler',
+        'chatWithButler',
+        {'message': message},
+      );
+}
+
+/// {@category Endpoint}
+class EndpointDebug extends _i2.EndpointRef {
+  EndpointDebug(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'debug';
+
+  _i3.Future<List<String>> listFiles() =>
+      caller.callServerEndpoint<List<String>>(
+        'debug',
+        'listFiles',
+        {},
+      );
+}
+
+/// {@category Endpoint}
+class EndpointDemo extends _i2.EndpointRef {
+  EndpointDemo(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'demo';
+
+  _i3.Future<void> seedPlants() => caller.callServerEndpoint<void>(
+    'demo',
+    'seedPlants',
+    {},
+  );
+}
+
+/// Endpoint for Google Account-based authentication.
+///
+/// This exposes the GoogleIdpBaseEndpoint login method to allow
+/// Flutter clients to authenticate using Google Sign-In.
+/// {@category Endpoint}
+class EndpointGoogleIdp extends _i1.EndpointGoogleIdpBase {
+  EndpointGoogleIdp(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'googleIdp';
+
+  /// Validates a Google ID token and either logs in the associated user or
+  /// creates a new user account if the Google account ID is not yet known.
+  ///
+  /// If a new user is created an associated [UserProfile] is also created.
+  @override
+  _i3.Future<_i4.AuthSuccess> login({
+    required String idToken,
+    required String? accessToken,
+  }) => caller.callServerEndpoint<_i4.AuthSuccess>(
+    'googleIdp',
+    'login',
+    {
+      'idToken': idToken,
+      'accessToken': accessToken,
+    },
+  );
+}
+
+/// {@category Endpoint}
+class EndpointWeather extends _i2.EndpointRef {
+  EndpointWeather(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'weather';
+
+  _i3.Future<_i6.WeatherData> getWeather(
+    double lat,
+    double lon,
+  ) => caller.callServerEndpoint<_i6.WeatherData>(
+    'weather',
+    'getWeather',
+    {
+      'lat': lat,
+      'lon': lon,
+    },
+  );
+}
+
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 /// {@category Endpoint}
@@ -245,8 +354,8 @@ class EndpointGreeting extends _i2.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message from the Butler.
-  _i3.Future<_i5.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i5.Greeting>(
+  _i3.Future<_i7.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i7.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -260,15 +369,15 @@ class EndpointGarden extends _i2.EndpointRef {
   @override
   String get name => 'garden';
 
-  _i3.Future<void> savePlant(_i6.Plant plant) =>
+  _i3.Future<void> savePlant(_i8.Plant plant) =>
       caller.callServerEndpoint<void>(
         'garden',
         'savePlant',
         {'plant': plant},
       );
 
-  _i3.Future<List<_i6.Plant>> getAllPlants() =>
-      caller.callServerEndpoint<List<_i6.Plant>>(
+  _i3.Future<List<_i8.Plant>> getAllPlants() =>
+      caller.callServerEndpoint<List<_i8.Plant>>(
         'garden',
         'getAllPlants',
         {},
@@ -279,6 +388,20 @@ class EndpointGarden extends _i2.EndpointRef {
     'deletePlant',
     {'id': id},
   );
+
+  _i3.Future<List<_i9.PlantPhoto>> getPhotosForPlant(int plantId) =>
+      caller.callServerEndpoint<List<_i9.PlantPhoto>>(
+        'garden',
+        'getPhotosForPlant',
+        {'plantId': plantId},
+      );
+
+  _i3.Future<void> savePlantPhoto(_i9.PlantPhoto photo) =>
+      caller.callServerEndpoint<void>(
+        'garden',
+        'savePlantPhoto',
+        {'photo': photo},
+      );
 
   _i3.Future<String?> getUploadDescription(String path) =>
       caller.callServerEndpoint<String?>(
@@ -297,13 +420,13 @@ class EndpointGarden extends _i2.EndpointRef {
 class Modules {
   Modules(Client client) {
     serverpod_auth_idp = _i1.Caller(client);
-    auth = _i7.Caller(client);
+    auth = _i10.Caller(client);
     serverpod_auth_core = _i4.Caller(client);
   }
 
   late final _i1.Caller serverpod_auth_idp;
 
-  late final _i7.Caller auth;
+  late final _i10.Caller auth;
 
   late final _i4.Caller serverpod_auth_core;
 }
@@ -328,7 +451,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i8.Protocol(),
+         _i11.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -339,6 +462,11 @@ class Client extends _i2.ServerpodClientShared {
        ) {
     emailIdp = EndpointEmailIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
+    butler = EndpointButler(this);
+    debug = EndpointDebug(this);
+    demo = EndpointDemo(this);
+    googleIdp = EndpointGoogleIdp(this);
+    weather = EndpointWeather(this);
     greeting = EndpointGreeting(this);
     garden = EndpointGarden(this);
     modules = Modules(this);
@@ -347,6 +475,16 @@ class Client extends _i2.ServerpodClientShared {
   late final EndpointEmailIdp emailIdp;
 
   late final EndpointJwtRefresh jwtRefresh;
+
+  late final EndpointButler butler;
+
+  late final EndpointDebug debug;
+
+  late final EndpointDemo demo;
+
+  late final EndpointGoogleIdp googleIdp;
+
+  late final EndpointWeather weather;
 
   late final EndpointGreeting greeting;
 
@@ -358,6 +496,11 @@ class Client extends _i2.ServerpodClientShared {
   Map<String, _i2.EndpointRef> get endpointRefLookup => {
     'emailIdp': emailIdp,
     'jwtRefresh': jwtRefresh,
+    'butler': butler,
+    'debug': debug,
+    'demo': demo,
+    'googleIdp': googleIdp,
+    'weather': weather,
     'greeting': greeting,
     'garden': garden,
   };

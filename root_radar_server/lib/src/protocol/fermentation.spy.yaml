@@ -1,0 +1,12 @@
+class: Fermentation
+table: fermentation
+fields:
+  name: String
+  harvestId: int?
+  startedAt: DateTime
+  status: String # Fermenting, Done, Failed
+  instructions: String? # User instructions like "Turn every 48 hours"
+  lastTurnedAt: DateTime?
+  nextTurnAt: DateTime?
+  notes: String?
+  userInfoId: int?

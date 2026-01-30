@@ -3,3 +3,5 @@ fields:
   temperature: double
   condition: String
   isHeatwave: bool
+  humidity: int?
+  precipitationRisk: double?

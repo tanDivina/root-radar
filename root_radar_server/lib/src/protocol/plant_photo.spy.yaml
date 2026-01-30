@@ -1,0 +1,8 @@
+class: PlantPhoto
+table: plant_photo
+fields:
+  plantId: int
+  imageUrl: String
+  timestamp: DateTime
+  notes: String?
+  userInfoId: int?

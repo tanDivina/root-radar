@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'radar_screen.dart';
+// import 'radar_screen.dart';
 import 'plant_list_screen.dart';
 import 'garden_map_screen.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'sign_in_screen.dart';
+import 'butler_screen.dart';
 import '../main.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,7 +25,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final List<Widget> screens = [
       const PlantListScreen(),
       const GardenMapScreen(),
-      if (isMobile) const RadarScreen(),
+      const ButlerScreen(),
+      // if (isMobile) const RadarScreen(),
     ];
 
     return SignInScreen(
@@ -41,6 +43,62 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
           ],
+        ),
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.green.shade800,
+                ),
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'assets/images/mascot.png',
+                      height: 60,
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Root Radar',
+                            style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            'Your Personal Garden Assistant',
+                            style: TextStyle(color: Colors.white70, overflow: TextOverflow.ellipsis),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.people),
+                title: const Text('Blue Morpho Butler'),
+                subtitle: const Text('Garden assistant and forecasts'),
+                onTap: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    _selectedIndex = 2; // Butler index
+                  });
+                },
+              ),
+               ListTile(
+                leading: const Icon(Icons.logout),
+                title: const Text('Sign Out'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await client.auth.signOutDevice();
+                },
+              ),
+            ],
+          ),
         ),
         body: IndexedStack(
           index: _selectedIndex,
@@ -60,11 +118,17 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icon(Icons.map),
               label: 'Map',
             ),
+            /*
             if (isMobile)
               const BottomNavigationBarItem(
                 icon: Icon(Icons.view_in_ar),
                 label: 'Radar',
               ),
+            */
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.face), // Face icon for AI/Butler - More standard
+              label: 'Blue Morpho',
+            ),
           ],
         ),
       ),

@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+version: 7.1.0+1
 
 environment:
   sdk: '^3.8.0'
@@ -29,14 +29,16 @@ dependencies:
     sdk: flutter
   root_radar_client:
     path: ../root_radar_client
-  serverpod_auth_idp_flutter: 3.1.1
-  serverpod_flutter: 3.1.1
-  ar_flutter_plugin: any
+  serverpod_auth_idp_flutter: ^3.2.3
+
+  serverpod_flutter: ^3.2.3
+
   intl: ^0.20.2
   vector_math: ^2.1.4
   google_maps_flutter: ^2.10.0
   geolocator: ^9.0.2
   image_picker: ^1.1.2
+  serverpod_auth_email_flutter: ^3.2.3
 
 dev_dependencies:
   flutter_lints: '>=3.0.0 <7.0.0'
@@ -66,8 +68,10 @@ flutter:
   # https://flutter.dev/assets-and-images/#from-packages
   assets:
     - assets/config.json
+    - assets/images/
 dependency_overrides:
   flutter_secure_storage: ^10.0.0
+
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a

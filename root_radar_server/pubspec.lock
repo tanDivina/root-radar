@@ -410,7 +410,7 @@ packages:
     source: hosted
     version: "1.0.0"
   path:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path
       sha256: "75cca69d1490965be98c73ceaea117e8a04dd21217b37b292c9ddbec0d955bc5"
@@ -482,7 +482,7 @@ packages:
     source: hosted
     version: "4.0.0"
   relic:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: relic
       sha256: "400bc37b0ee5f8d02c911fb4213a5f3cb3f39496fc806c81f22ad25f1930bd15"

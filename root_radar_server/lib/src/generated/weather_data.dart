@@ -18,12 +18,16 @@ abstract class WeatherData
     required this.temperature,
     required this.condition,
     required this.isHeatwave,
+    this.humidity,
+    this.precipitationRisk,
   });
 
   factory WeatherData({
     required double temperature,
     required String condition,
     required bool isHeatwave,
+    int? humidity,
+    double? precipitationRisk,
   }) = _WeatherDataImpl;
 
   factory WeatherData.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -31,6 +35,9 @@ abstract class WeatherData
       temperature: (jsonSerialization['temperature'] as num).toDouble(),
       condition: jsonSerialization['condition'] as String,
       isHeatwave: jsonSerialization['isHeatwave'] as bool,
+      humidity: jsonSerialization['humidity'] as int?,
+      precipitationRisk: (jsonSerialization['precipitationRisk'] as num?)
+          ?.toDouble(),
     );
   }
 
@@ -40,6 +47,10 @@ abstract class WeatherData
 
   bool isHeatwave;
 
+  int? humidity;
+
+  double? precipitationRisk;
+
   /// Returns a shallow copy of this [WeatherData]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -47,6 +58,8 @@ abstract class WeatherData
     double? temperature,
     String? condition,
     bool? isHeatwave,
+    int? humidity,
+    double? precipitationRisk,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -55,6 +68,8 @@ abstract class WeatherData
       'temperature': temperature,
       'condition': condition,
       'isHeatwave': isHeatwave,
+      if (humidity != null) 'humidity': humidity,
+      if (precipitationRisk != null) 'precipitationRisk': precipitationRisk,
     };
   }
 
@@ -65,6 +80,8 @@ abstract class WeatherData
       'temperature': temperature,
       'condition': condition,
       'isHeatwave': isHeatwave,
+      if (humidity != null) 'humidity': humidity,
+      if (precipitationRisk != null) 'precipitationRisk': precipitationRisk,
     };
   }
 
@@ -74,15 +91,21 @@ abstract class WeatherData
   }
 }
 
+class _Undefined {}
+
 class _WeatherDataImpl extends WeatherData {
   _WeatherDataImpl({
     required double temperature,
     required String condition,
     required bool isHeatwave,
+    int? humidity,
+    double? precipitationRisk,
   }) : super._(
          temperature: temperature,
          condition: condition,
          isHeatwave: isHeatwave,
+         humidity: humidity,
+         precipitationRisk: precipitationRisk,
        );
 
   /// Returns a shallow copy of this [WeatherData]
@@ -93,11 +116,17 @@ class _WeatherDataImpl extends WeatherData {
     double? temperature,
     String? condition,
     bool? isHeatwave,
+    Object? humidity = _Undefined,
+    Object? precipitationRisk = _Undefined,
   }) {
     return WeatherData(
       temperature: temperature ?? this.temperature,
       condition: condition ?? this.condition,
       isHeatwave: isHeatwave ?? this.isHeatwave,
+      humidity: humidity is int? ? humidity : this.humidity,
+      precipitationRisk: precipitationRisk is double?
+          ? precipitationRisk
+          : this.precipitationRisk,
     );
   }
 }

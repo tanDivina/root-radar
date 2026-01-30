@@ -1,0 +1,10 @@
+class: CacaoBatch
+table: cacao_batch
+fields:
+  name: String
+  status: String # Fermenting, Drying, Storage, Shipped
+  stage: String # Box 1, Box 2, Box 3, Slide A, Slide B
+  startedAt: DateTime
+  lastStirredAt: DateTime?
+  weight: double?
+  userInfoId: int?
