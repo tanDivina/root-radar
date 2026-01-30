@@ -28,7 +28,12 @@ void run(List<String> args) async {
   pod.initializeAuthServices(
     tokenManagerBuilders: [
       // Use JWT for authentication keys towards the server.
-      JwtConfigFromPasswords(),
+      // JwtConfigFromPasswords(), <-- CRASHES if passwords.yaml is missing
+      AuthConfig(
+        jwtConfig: JwtConfig(
+          signingKey: 'TemporaryHardcodedKeyForDemoOnly12345!', 
+        ),
+      ),
     ],
     identityProviderBuilders: [
       /* 
