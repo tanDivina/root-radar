@@ -6,6 +6,7 @@ import 'garden_map_screen.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'sign_in_screen.dart';
 import 'butler_screen.dart';
+import 'harvest_overview_screen.dart';
 import '../main.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -32,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return SignInScreen(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Root Radar'),
+          title: const Text('Root Radar v7.1.0'),
           backgroundColor: Colors.green.shade800,
           foregroundColor: Colors.white,
           actions: [
@@ -87,6 +88,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   setState(() {
                     _selectedIndex = 2; // Butler index
                   });
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.assessment_outlined),
+                title: const Text('Harvest Overview'),
+                subtitle: const Text('Track your crop maturity'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HarvestOverviewScreen()),
+                  );
                 },
               ),
                ListTile(
