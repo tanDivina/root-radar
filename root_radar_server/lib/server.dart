@@ -29,10 +29,8 @@ void run(List<String> args) async {
     tokenManagerBuilders: [
       // Use JWT for authentication keys towards the server.
       // JwtConfigFromPasswords(), <-- CRASHES if passwords.yaml is missing
-      AuthConfig(
-        jwtConfig: JwtConfig(
-          signingKey: 'TemporaryHardcodedKeyForDemoOnly12345!', 
-        ),
+      JwtConfig(
+        signingKey: 'TemporaryHardcodedKeyForDemoOnly12345!', 
       ),
     ],
     identityProviderBuilders: [
